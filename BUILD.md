@@ -31,8 +31,6 @@ Status legend: `⬜ Not started` | `🔵 In progress` | `✅ Complete` | `❌ Bl
 
 ## Immediate Notes
 - `pipeline_novel.py` is now the active runtime entrypoint for chapter generation.
-- Reused modules were copied from `Story_Time` where they are still structurally useful.
-- Port `7865` was serving `/Users/wes/Desktop/Story_Time/chatterbox`, not this repo-local `chatterbox/` app.
 - Step 3 should use the repo-local Gradio TTS UI for voice tuning before narration is approved.
 - Root-level `config.py` exists only as a compatibility shim for copied modules.
 - Runtime memory guardrails are now staged (warn -> throttle -> auto-pause -> emergency stop) via environment thresholds.

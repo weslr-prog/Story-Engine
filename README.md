@@ -31,7 +31,7 @@ Large GGUF models should live on the external M.2 SSD. See models/README.md.
 
 - engine/: core runtime modules
 - genre_packs/: prompt and rule packs per genre
-- ui/: adapted studio backend from Story_Time
+- ui/: Story-Engine local studio backend and dashboard
 - scripts/: operational scripts and preflight checks
 - projects/: per-story working directories and template inputs
-- chatterbox/: copied for later TTS integration
+- chatterbox/: repo-local TTS integration source

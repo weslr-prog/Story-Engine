@@ -31,6 +31,14 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+## 2.1 Create an Offline Backup (Recommended Before Cleanup)
+
+```bash
+bash scripts/backup_story_engine_to_m2.sh "/Volumes/256 M.2/Story-Engine-backups"
+```
+
+This creates timestamped archives, git bundles, status snapshots, and checksums.
+
 ## 3. Preflight Check (Do This First)
 
 Run:
@@ -126,7 +134,7 @@ If prose is too long, too vague, or too repetitive, tighten these first.
 
 ### 5.3 Dashboard for Sections 5.2 to 9
 
-Launch the minimal run dashboard:
+Launch the Story Studio tabbed dashboard:
 
 ```bash
 python ui/gradio_dashboard.py
@@ -143,7 +151,31 @@ What it shows:
 - review packet path
 - run log tail
 
+Tabs include:
+- Projects
+- Inputs
+- Convert
+- Voice
+- Downloads
+- Run Dashboard
+
 Use this to monitor the active/current work during generation, review, and narration gates.
+
+### 5.4 Validate Phase 1-4 Prompt Outputs (Recommended)
+
+If you generated source docs with `docs/Update Story Pipeline.txt`, validate the output docs before conversion:
+
+```bash
+python scripts/validate_phase_docs.py --source-dir "The Last Signal" --require-phase4
+```
+
+Then import those docs from the Inputs tab (or via `Import The Last Signal Sources`) and run conversion.
+
+CLI alternative (no UI):
+
+```bash
+python scripts/ingest_prompt_outputs.py --source-dir "The Last Signal" --out-dir . --require-phase4
+```
 
 ## 6. Voice Sample Setup
 

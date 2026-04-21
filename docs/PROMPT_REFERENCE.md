@@ -165,3 +165,38 @@ python -c "import json; json.load(open('story_bible.json')); print('story_bible.
 python -c "import json; json.load(open('characters.json')); print('characters.json OK')"
 python -c "import json; json.load(open('chapter_briefs.json')); print('chapter_briefs.json OK')"
 ```
+
+## 8. Prompt Output Compatibility (Phase 1-4)
+
+If you generate source docs using the Update Story Pipeline prompt workflow, validate those text outputs before import/conversion.
+
+Expected files (in `The Last Signal/` by default):
+- `Phase 1 - Story DNA Summary.txt`
+- `Phase 2 - Story Bible.txt`
+- `Phase 3 - Chapter Blueprint.txt`
+- optional: `Phase 4 - Writing Prompts.txt`
+
+Run validator:
+
+```bash
+python scripts/validate_phase_docs.py --source-dir "The Last Signal" --require-phase4
+```
+
+Or run one-step ingest + conversion into Story-Engine root files:
+
+```bash
+python scripts/ingest_prompt_outputs.py --source-dir "The Last Signal" --out-dir . --require-phase4
+```
+
+Phase 3 strict labels checked by validator:
+- `Word target`
+- `POV`
+- `SCENE ZERO`
+- `SCENE BREAKDOWN`
+- `CHARACTER BEAT`
+- `ACTION BEAT`
+- `EMOTIONAL BEAT`
+- `INTERIORITY BEAT`
+- `CLIFFHANGER`
+
+If validation fails, normalize labels in the source text and rerun conversion.
