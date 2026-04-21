@@ -1,0 +1,176 @@
+[2026-04-20 22:33:39] [INFO] Resolved Chatterbox backend root_url=http://127.0.0.1:7865 api_prefix=/gradio_api api_name=/generate endpoints=/generate,/load_model
+[2026-04-20 22:33:39] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/load_model/3e44525438b44b3fb92d45ad27854995
+[2026-04-20 22:33:54] [DEBUG] SSE /load_model event: heartbeat
+[2026-04-20 22:33:54] [DEBUG] SSE /load_model data: null
+[2026-04-20 22:33:57] [DEBUG] SSE /load_model event: complete
+[2026-04-20 22:33:57] [DEBUG] SSE /load_model data: [null]
+[2026-04-20 22:33:57] [INFO] Model load completed event_id=3e44525438b44b3fb92d45ad27854995
+[2026-04-20 22:33:57] [INFO] Uploaded voice sample local_voice=voices/p233_023.wav remote_voice=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav
+[2026-04-20 22:33:57] [INFO] TTS chapter 1 start sentences=9 voice=voices/p233_023.wav api=/generate resume=True
+[2026-04-20 22:33:57] [WARN] Missing source hash in chapter 1 manifest; forcing regeneration
+[2026-04-20 22:33:57] [INFO] Narration source changed for chapter 1; invalidating cached segments
+[2026-04-20 22:33:57] [DEBUG] TTS sentence attempt chapter=1 sentence_index=1 sentence_total=9 attempt=1 attempt_total=2 chars=293 preview=Here's the revised script for the first act of chapter 1: Chapter 1: Act 1 Scene 1: Tighten Pros
+[2026-04-20 22:33:57] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/ea922f11af2843fc9a9bee4957aff010
+[2026-04-20 22:33:57] [DEBUG] SSE /generate event: error
+[2026-04-20 22:33:57] [DEBUG] SSE /generate data: null
+[2026-04-20 22:33:57] [WARN] Sentence generation failed chapter=1 sentence_index=1 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:33:58] [DEBUG] TTS sentence attempt chapter=1 sentence_index=1 sentence_total=9 attempt=2 attempt_total=2 chars=293 preview=Here's the revised script for the first act of chapter 1: Chapter 1: Act 1 Scene 1: Tighten Pros
+[2026-04-20 22:33:58] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/c20744b31d454c238987053cc6df5697
+[2026-04-20 22:33:58] [DEBUG] SSE /generate event: error
+[2026-04-20 22:33:58] [DEBUG] SSE /generate data: null
+[2026-04-20 22:33:58] [WARN] Sentence generation failed chapter=1 sentence_index=1 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:33:59] [WARN] Sentence failed after retries chapter=1 sentence_index=1 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:33:59] [DEBUG] TTS sentence attempt chapter=1 sentence_index=2 sentence_total=9 attempt=1 attempt_total=2 chars=148 preview=The scene-level detail is the intricate process of unravelling the evidence that reveals the bre
+[2026-04-20 22:33:59] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/bd1c0d0ca2dd4f1fa1a3ef9d32452512
+[2026-04-20 22:33:59] [DEBUG] SSE /generate event: error
+[2026-04-20 22:33:59] [DEBUG] SSE /generate data: null
+[2026-04-20 22:33:59] [WARN] Sentence generation failed chapter=1 sentence_index=2 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:00] [DEBUG] TTS sentence attempt chapter=1 sentence_index=2 sentence_total=9 attempt=2 attempt_total=2 chars=148 preview=The scene-level detail is the intricate process of unravelling the evidence that reveals the bre
+[2026-04-20 22:34:00] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/127503dccf32498393ebb6420bfda43e
+[2026-04-20 22:34:00] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:00] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:00] [WARN] Sentence generation failed chapter=1 sentence_index=2 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:01] [WARN] Sentence failed after retries chapter=1 sentence_index=2 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:01] [DEBUG] TTS sentence attempt chapter=1 sentence_index=3 sentence_total=9 attempt=1 attempt_total=2 chars=103 preview=The key events are the conflicting evidence, the risky decision, and the revealing data visualiz
+[2026-04-20 22:34:01] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/5aa254ab9de34e84a496dec088c078e9
+[2026-04-20 22:34:01] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:01] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:01] [WARN] Sentence generation failed chapter=1 sentence_index=3 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:02] [DEBUG] TTS sentence attempt chapter=1 sentence_index=3 sentence_total=9 attempt=2 attempt_total=2 chars=103 preview=The key events are the conflicting evidence, the risky decision, and the revealing data visualiz
+[2026-04-20 22:34:02] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/5938d0db851146bcb183264e4fb9cb55
+[2026-04-20 22:34:02] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:02] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:02] [WARN] Sentence generation failed chapter=1 sentence_index=3 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:04] [WARN] Sentence failed after retries chapter=1 sentence_index=3 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:04] [DEBUG] TTS sentence attempt chapter=1 sentence_index=4 sentence_total=9 attempt=1 attempt_total=2 chars=77 preview=The scene-level clarity is the dimly lit receiving room in a secure facility.
+[2026-04-20 22:34:04] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/bfbe0f281288480aab1a3a13405ff23a
+[2026-04-20 22:34:04] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:04] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:04] [WARN] Sentence generation failed chapter=1 sentence_index=4 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:04] [DEBUG] TTS sentence attempt chapter=1 sentence_index=4 sentence_total=9 attempt=2 attempt_total=2 chars=77 preview=The scene-level clarity is the dimly lit receiving room in a secure facility.
+[2026-04-20 22:34:04] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/4d3d400572eb4522906e69cfc7af848c
+[2026-04-20 22:34:05] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:05] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:05] [WARN] Sentence generation failed chapter=1 sentence_index=4 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:06] [WARN] Sentence failed after retries chapter=1 sentence_index=4 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:06] [DEBUG] TTS sentence attempt chapter=1 sentence_index=5 sentence_total=9 attempt=1 attempt_total=2 chars=101 preview=The speaker is a discreet, guarded Mara Quill, who is both the protagonist and the scene's chara
+[2026-04-20 22:34:06] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/693d44ce4dbb45109e5e82d6e20c05ac
+[2026-04-20 22:34:06] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:06] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:06] [WARN] Sentence generation failed chapter=1 sentence_index=5 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:07] [DEBUG] TTS sentence attempt chapter=1 sentence_index=5 sentence_total=9 attempt=2 attempt_total=2 chars=101 preview=The speaker is a discreet, guarded Mara Quill, who is both the protagonist and the scene's chara
+[2026-04-20 22:34:07] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/7e5cc14481df4b74a957569a4695a3fc
+[2026-04-20 22:34:07] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:07] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:07] [WARN] Sentence generation failed chapter=1 sentence_index=5 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:08] [WARN] Sentence failed after retries chapter=1 sentence_index=5 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:08] [DEBUG] TTS sentence attempt chapter=1 sentence_index=6 sentence_total=9 attempt=1 attempt_total=2 chars=200 preview=The audience is left to wonder what new chaallenges they will face together. (Characters and Pro
+[2026-04-20 22:34:08] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/50cff44f13524f3aa76b2fe724452b34
+[2026-04-20 22:34:08] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:08] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:08] [WARN] Sentence generation failed chapter=1 sentence_index=6 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:09] [DEBUG] TTS sentence attempt chapter=1 sentence_index=6 sentence_total=9 attempt=2 attempt_total=2 chars=200 preview=The audience is left to wonder what new chaallenges they will face together. (Characters and Pro
+[2026-04-20 22:34:09] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/93f8b99c8c204a33a567a0aec50e1986
+[2026-04-20 22:34:09] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:09] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:09] [WARN] Sentence generation failed chapter=1 sentence_index=6 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:11] [WARN] Sentence failed after retries chapter=1 sentence_index=6 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:11] [DEBUG] TTS sentence attempt chapter=1 sentence_index=7 sentence_total=9 attempt=1 attempt_total=2 chars=193 preview=The audience is left to wonder what new chaallenges they will face together. (Character Logic) M
+[2026-04-20 22:34:11] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/2c71e6bc2cfd4cbca0caa048f87d5a05
+[2026-04-20 22:34:11] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:11] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:11] [WARN] Sentence generation failed chapter=1 sentence_index=7 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:11] [DEBUG] TTS sentence attempt chapter=1 sentence_index=7 sentence_total=9 attempt=2 attempt_total=2 chars=193 preview=The audience is left to wonder what new chaallenges they will face together. (Character Logic) M
+[2026-04-20 22:34:11] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/33f05532da5247c993072a2e7e7c108b
+[2026-04-20 22:34:11] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:11] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:11] [WARN] Sentence generation failed chapter=1 sentence_index=7 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:13] [WARN] Sentence failed after retries chapter=1 sentence_index=7 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:13] [DEBUG] TTS sentence attempt chapter=1 sentence_index=8 sentence_total=9 attempt=1 attempt_total=2 chars=207 preview=The audience can expect to encounter a high degree of characterization, particularly with Mara's
+[2026-04-20 22:34:13] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/fe7937fb9f214cc88c27336b9739c512
+[2026-04-20 22:34:13] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:13] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:13] [WARN] Sentence generation failed chapter=1 sentence_index=8 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:14] [DEBUG] TTS sentence attempt chapter=1 sentence_index=8 sentence_total=9 attempt=2 attempt_total=2 chars=207 preview=The audience can expect to encounter a high degree of characterization, particularly with Mara's
+[2026-04-20 22:34:14] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/db81966977da437099fd2d00d94682b6
+[2026-04-20 22:34:14] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:14] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:14] [WARN] Sentence generation failed chapter=1 sentence_index=8 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:15] [WARN] Sentence failed after retries chapter=1 sentence_index=8 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:15] [DEBUG] TTS sentence attempt chapter=1 sentence_index=9 sentence_total=9 attempt=1 attempt_total=2 chars=111 preview=The audience can expect to encounter a high degree of plot-level clarity, particularly with Mara
+[2026-04-20 22:34:15] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/009d5877c475472a861bc3cd68109f34
+[2026-04-20 22:34:15] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:15] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:15] [WARN] Sentence generation failed chapter=1 sentence_index=9 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:16] [DEBUG] TTS sentence attempt chapter=1 sentence_index=9 sentence_total=9 attempt=2 attempt_total=2 chars=111 preview=The audience can expect to encounter a high degree of plot-level clarity, particularly with Mara
+[2026-04-20 22:34:16] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/87764e673ab74541a2b891ea2c31fd03
+[2026-04-20 22:34:16] [DEBUG] SSE /generate event: error
+[2026-04-20 22:34:16] [DEBUG] SSE /generate data: null
+[2026-04-20 22:34:16] [WARN] Sentence generation failed chapter=1 sentence_index=9 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:34:17] [WARN] Sentence failed after retries chapter=1 sentence_index=9 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 23:02:30] [INFO] Resolved Chatterbox backend root_url=http://127.0.0.1:7865 api_prefix=/gradio_api api_name=/generate endpoints=/generate,/load_model
+[2026-04-20 23:02:30] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/load_model/f96e0ca970174d4ba0eac0f28db7abf7
+[2026-04-20 23:02:45] [DEBUG] SSE /load_model event: heartbeat
+[2026-04-20 23:02:45] [DEBUG] SSE /load_model data: null
+[2026-04-20 23:02:49] [DEBUG] SSE /load_model event: complete
+[2026-04-20 23:02:49] [DEBUG] SSE /load_model data: [null]
+[2026-04-20 23:02:49] [INFO] Model load completed event_id=f96e0ca970174d4ba0eac0f28db7abf7
+[2026-04-20 23:02:49] [INFO] Uploaded voice sample local_voice=voices/p233_023.wav remote_voice=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav
+[2026-04-20 23:02:49] [INFO] TTS chapter 1 start sentences=9 voice=voices/p233_023.wav api=/generate resume=True
+[2026-04-20 23:02:49] [DEBUG] TTS sentence attempt chapter=1 sentence_index=1 sentence_total=9 attempt=1 attempt_total=2 chars=293 preview=Here's the revised script for the first act of chapter 1: Chapter 1: Act 1 Scene 1: Tighten Pros
+[2026-04-20 23:02:49] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/fe64f76236ef40068c27ade1ef188c4c
+[2026-04-20 23:03:07] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:03:07] [DEBUG] SSE /generate data: null
+[2026-04-20 23:03:20] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:03:20] [DEBUG] SSE /generate data: null
+[2026-04-20 23:03:35] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:03:35] [DEBUG] SSE /generate data: null
+[2026-04-20 23:03:50] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:03:50] [DEBUG] SSE /generate data: null
+[2026-04-20 23:04:05] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:04:05] [DEBUG] SSE /generate data: null
+[2026-04-20 23:04:20] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:04:20] [DEBUG] SSE /generate data: null
+[2026-04-20 23:04:35] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:04:35] [DEBUG] SSE /generate data: null
+[2026-04-20 23:04:50] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:04:50] [DEBUG] SSE /generate data: null
+[2026-04-20 23:05:05] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:05:05] [DEBUG] SSE /generate data: null
+[2026-04-20 23:05:20] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:05:20] [DEBUG] SSE /generate data: null
+[2026-04-20 23:05:35] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:05:35] [DEBUG] SSE /generate data: null
+[2026-04-20 23:05:49] [WARN] Sentence generation failed chapter=1 sentence_index=1 attempt=1 sleep_seconds=0.750 error=("Connection broken: TimeoutError('chapter 1 sentence 0 exceeded 180s')", TimeoutError('chapter 1 sentence 0 exceeded 180s'))
+[2026-04-20 23:05:50] [DEBUG] TTS sentence attempt chapter=1 sentence_index=1 sentence_total=9 attempt=2 attempt_total=2 chars=293 preview=Here's the revised script for the first act of chapter 1: Chapter 1: Act 1 Scene 1: Tighten Pros
+[2026-04-20 23:05:57] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/8e89ea9606b044418daee9c12a33820f
+[2026-04-20 23:06:12] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:06:12] [DEBUG] SSE /generate data: null
+[2026-04-20 23:06:27] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:06:27] [DEBUG] SSE /generate data: null
+[2026-04-20 23:06:42] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:06:42] [DEBUG] SSE /generate data: null
+[2026-04-20 23:06:57] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:06:57] [DEBUG] SSE /generate data: null
+[2026-04-20 23:07:12] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:07:12] [DEBUG] SSE /generate data: null
+[2026-04-20 23:07:27] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:07:27] [DEBUG] SSE /generate data: null
+[2026-04-20 23:07:42] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:07:42] [DEBUG] SSE /generate data: null
+[2026-04-20 23:07:57] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:07:57] [DEBUG] SSE /generate data: null
+[2026-04-20 23:08:12] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:08:12] [DEBUG] SSE /generate data: null
+[2026-04-20 23:08:27] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:08:27] [DEBUG] SSE /generate data: null
+[2026-04-20 23:08:42] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:08:42] [DEBUG] SSE /generate data: null
+[2026-04-20 23:08:50] [WARN] Sentence generation failed chapter=1 sentence_index=1 attempt=2 sleep_seconds=1.500 error=("Connection broken: TimeoutError('chapter 1 sentence 0 exceeded 180s')", TimeoutError('chapter 1 sentence 0 exceeded 180s'))
+[2026-04-20 23:08:51] [WARN] Sentence failed after retries chapter=1 sentence_index=1 error=("Connection broken: TimeoutError('chapter 1 sentence 0 exceeded 180s')", TimeoutError('chapter 1 sentence 0 exceeded 180s'))
+[2026-04-20 23:08:51] [DEBUG] TTS sentence attempt chapter=1 sentence_index=2 sentence_total=9 attempt=1 attempt_total=2 chars=148 preview=The scene-level detail is the intricate process of unravelling the evidence that reveals the bre
+[2026-04-20 23:08:51] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/39c353c269a4409aa8ff183f28e5ec75
+[2026-04-20 23:09:06] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:09:06] [DEBUG] SSE /generate data: null
+[2026-04-20 23:09:21] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 23:09:21] [DEBUG] SSE /generate data: null

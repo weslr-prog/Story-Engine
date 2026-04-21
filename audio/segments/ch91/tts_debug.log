@@ -1,0 +1,33 @@
+[2026-04-20 22:27:00] [INFO] Resolved Chatterbox backend root_url=http://127.0.0.1:7865 api_prefix=/gradio_api api_name=/generate endpoints=/generate,/load_model
+[2026-04-20 22:27:00] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/load_model/19bfb9078a2f4eb1990482509be18d6a
+[2026-04-20 22:27:15] [DEBUG] SSE /load_model event: heartbeat
+[2026-04-20 22:27:15] [DEBUG] SSE /load_model data: null
+[2026-04-20 22:27:15] [DEBUG] SSE /load_model event: complete
+[2026-04-20 22:27:15] [DEBUG] SSE /load_model data: [null]
+[2026-04-20 22:27:15] [INFO] Model load completed event_id=19bfb9078a2f4eb1990482509be18d6a
+[2026-04-20 22:27:15] [INFO] Uploaded voice sample local_voice=voices/p233_023.wav remote_voice=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav
+[2026-04-20 22:27:15] [INFO] TTS chapter 91 start sentences=2 voice=voices/p233_023.wav api=/generate resume=True
+[2026-04-20 22:27:15] [WARN] Missing source hash in chapter 91 manifest; forcing regeneration
+[2026-04-20 22:27:15] [INFO] Narration source changed for chapter 91; invalidating cached segments
+[2026-04-20 22:27:15] [DEBUG] TTS sentence attempt chapter=91 sentence_index=1 sentence_total=2 attempt=1 attempt_total=2 chars=21 preview=This is a smoke test.
+[2026-04-20 22:27:15] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/7dd042f81c9743c4b75f33668546f1e0
+[2026-04-20 22:27:15] [DEBUG] SSE /generate event: error
+[2026-04-20 22:27:15] [DEBUG] SSE /generate data: null
+[2026-04-20 22:27:15] [WARN] Sentence generation failed chapter=91 sentence_index=1 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:27:16] [DEBUG] TTS sentence attempt chapter=91 sentence_index=1 sentence_total=2 attempt=2 attempt_total=2 chars=21 preview=This is a smoke test.
+[2026-04-20 22:27:16] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/08c5a6957d5e4a63993126bfbd80514d
+[2026-04-20 22:27:16] [DEBUG] SSE /generate event: error
+[2026-04-20 22:27:16] [DEBUG] SSE /generate data: null
+[2026-04-20 22:27:16] [WARN] Sentence generation failed chapter=91 sentence_index=1 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:27:18] [WARN] Sentence failed after retries chapter=91 sentence_index=1 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:27:18] [DEBUG] TTS sentence attempt chapter=91 sentence_index=2 sentence_total=2 attempt=1 attempt_total=2 chars=40 preview=This should produce two clean sentences.
+[2026-04-20 22:27:18] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/e24e7bd0846a4532bec548f7b51c8803
+[2026-04-20 22:27:18] [DEBUG] SSE /generate event: error
+[2026-04-20 22:27:18] [DEBUG] SSE /generate data: null
+[2026-04-20 22:27:18] [WARN] Sentence generation failed chapter=91 sentence_index=2 attempt=1 sleep_seconds=0.750 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:27:18] [DEBUG] TTS sentence attempt chapter=91 sentence_index=2 sentence_total=2 attempt=2 attempt_total=2 chars=40 preview=This should produce two clean sentences.
+[2026-04-20 22:27:18] [DEBUG] SSE open http://127.0.0.1:7865/gradio_api/call/generate/fedf546d5d22440a8c3036d339666441
+[2026-04-20 22:27:18] [DEBUG] SSE /generate event: error
+[2026-04-20 22:27:18] [DEBUG] SSE /generate data: null
+[2026-04-20 22:27:18] [WARN] Sentence generation failed chapter=91 sentence_index=2 attempt=2 sleep_seconds=1.500 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]
+[2026-04-20 22:27:20] [WARN] Sentence failed after retries chapter=91 sentence_index=2 error=Chatterbox generation failed via /generate; raw_events=[{"event": "error", "data": null, "raw": "null"}]

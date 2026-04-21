@@ -1,0 +1,12 @@
+genre_name: mystery
+writer_prefix: >-
+  Write with controlled revelation, clue discipline, and sustained uncertainty.
+editor_prefix: >-
+  Strengthen clue placement, suspect logic, and payoff integrity without over-explaining.
+structural_fields:
+  - clue_chain
+  - suspect_pressure
+  - false_lead
+content_rules:
+  - Hide answers without hiding necessary setup.
+  - Every clue should either deepen mystery or redirect suspicion.

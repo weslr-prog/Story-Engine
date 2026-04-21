@@ -1,0 +1,318 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.tab { padding: 7px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); font-size: 13px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.tab:hover:not(.active) { background: var(--color-background-secondary); }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); padding: 14px 16px; margin-bottom: 10px; }
+.card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 5px; }
+.card-body { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: 20px; }
+.b-green { background: #EAF3DE; color: #27500A; }
+.b-amber { background: #FAEEDA; color: #633806; }
+.b-red   { background: #FCEBEB; color: #501313; }
+.b-blue  { background: #E6F1FB; color: #0C447C; }
+.b-purple{ background: #EEEDFE; color: #3C3489; }
+@media (prefers-color-scheme: dark) {
+  .b-green  { background: #173404; color: #C0DD97; }
+  .b-amber  { background: #412402; color: #FAC775; }
+  .b-red    { background: #501313; color: #F7C1C1; }
+  .b-blue   { background: #042C53; color: #B5D4F4; }
+  .b-purple { background: #26215C; color: #CECBF6; }
+}
+.impact-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+.impact-icon { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; margin-top: 1px; }
+.icon-plus  { background: #EAF3DE; color: #27500A; }
+.icon-warn  { background: #FAEEDA; color: #633806; }
+.icon-new   { background: #EEEDFE; color: #3C3489; }
+@media (prefers-color-scheme: dark) {
+  .icon-plus { background: #173404; color: #C0DD97; }
+  .icon-warn { background: #412402; color: #FAC775; }
+  .icon-new  { background: #26215C; color: #CECBF6; }
+}
+.impact-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; flex: 1; }
+.impact-text strong { color: var(--color-text-primary); font-weight: 500; }
+.section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--color-text-secondary); margin: 18px 0 10px; }
+.tier-row { display: flex; align-items: center; gap: 0; margin-bottom: 8px; }
+.tier-box { flex: 1; padding: 10px 12px; border: 0.5px solid var(--color-border-tertiary); font-size: 12px; }
+.tier-box:first-child { border-radius: var(--border-radius-md) 0 0 var(--border-radius-md); }
+.tier-box:last-child  { border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; }
+.tier-name { font-weight: 500; color: var(--color-text-primary); font-size: 12px; }
+.tier-sub  { color: var(--color-text-secondary); font-size: 11px; margin-top: 2px; }
+.t-gpu    { background: #EEEDFE; border-color: #AFA9EC; }
+.t-ram    { background: #E6F1FB; border-color: #85B7EB; }
+.t-nvme   { background: #EAF3DE; border-color: #97C459; }
+@media (prefers-color-scheme: dark) {
+  .t-gpu  { background: #26215C; border-color: #7F77DD; }
+  .t-ram  { background: #042C53; border-color: #378ADD; }
+  .t-nvme { background: #173404; border-color: #639922; }
+}
+.model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.model-card { border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); padding: 11px 13px; }
+.model-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.model-detail { font-size: 12px; color: var(--color-text-secondary); margin-top: 3px; line-height: 1.4; }
+.unlock-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.unlock-row:last-child { border-bottom: none; }
+.unlock-label { font-size: 13px; color: var(--color-text-primary); flex: 1; }
+.unlock-before { font-size: 12px; color: var(--color-text-tertiary); min-width: 80px; text-decoration: line-through; }
+.unlock-after  { font-size: 12px; font-weight: 500; min-width: 80px; }
+.big-banner { border-radius: var(--border-radius-lg); padding: 16px 18px; margin-bottom: 14px; }
+.bb-purple { background: #EEEDFE; border: 0.5px solid #AFA9EC; }
+.bb-green  { background: #EAF3DE; border: 0.5px solid #97C459; }
+.bb-amber  { background: #FAEEDA; border: 0.5px solid #EF9F27; }
+@media (prefers-color-scheme: dark) {
+  .bb-purple { background: #26215C; border-color: #7F77DD; }
+  .bb-green  { background: #173404; border-color: #639922; }
+  .bb-amber  { background: #412402; border-color: #BA7517; }
+}
+.bb-title { font-size: 14px; font-weight: 500; margin-bottom: 5px; }
+.bb-purple .bb-title { color: #3C3489; }
+.bb-green  .bb-title { color: #27500A; }
+.bb-amber  .bb-title { color: #633806; }
+@media (prefers-color-scheme: dark) {
+  .bb-purple .bb-title { color: #CECBF6; }
+  .bb-green  .bb-title  { color: #C0DD97; }
+  .bb-amber  .bb-title  { color: #FAC775; }
+}
+.bb-body { font-size: 13px; line-height: 1.55; }
+.bb-purple .bb-body { color: #534AB7; }
+.bb-green  .bb-body  { color: #3B6D11; }
+.bb-amber  .bb-body  { color: #854F0B; }
+@media (prefers-color-scheme: dark) {
+  .bb-purple .bb-body { color: #AFA9EC; }
+  .bb-green  .bb-body  { color: #97C459; }
+  .bb-amber  .bb-body  { color: #EF9F27; }
+}
+.flow-strip { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+.flow-node { border-radius: var(--border-radius-md); padding: 7px 11px; font-size: 12px; font-weight: 500; border: 0.5px solid; white-space: nowrap; }
+.fn-purple { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; }
+.fn-blue   { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+.fn-teal   { background: #E1F5EE; border-color: #5DCAA5; color: #085041; }
+.fn-amber  { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.fn-green  { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.fn-gray   { background: #F1EFE8; border-color: #B4B2A9; color: #444441; }
+@media (prefers-color-scheme: dark) {
+  .fn-purple { background: #26215C; border-color: #7F77DD; color: #CECBF6; }
+  .fn-blue   { background: #042C53; border-color: #378ADD; color: #B5D4F4; }
+  .fn-teal   { background: #04342C; border-color: #1D9E75; color: #9FE1CB; }
+  .fn-amber  { background: #412402; border-color: #BA7517; color: #FAC775; }
+  .fn-green  { background: #173404; border-color: #639922; color: #C0DD97; }
+  .fn-gray   { background: #2C2C2A; border-color: #888780; color: #D3D1C7; }
+}
+.arr { color: var(--color-text-tertiary); font-size: 14px; }
+</style>
+
+<h2 class="sr-only">Analysis of how Hypura (Apple Silicon LLM inference scheduler) impacts each novel engine architecture approach, with model tier unlocks and a revised optimal design</h2>
+
+<div style="padding: 1rem 0;">
+
+<div class="big-banner bb-purple">
+  <div class="bb-title">Hypura is a near-perfect fit for this project</div>
+  <div class="bb-body">It solves your crash concern directly — OOM errors become graceful NVMe streaming instead of kill signals. And it removes the hardware ceiling, unlocking models far beyond what fits in 8–16 GB RAM. Its Ollama-compatible API means it's a drop-in replacement in all three approaches.</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('what', this)">What Hypura does</button>
+  <button class="tab" onclick="show('a1', this)">Approach 1 impact</button>
+  <button class="tab" onclick="show('a2', this)">Approach 2 impact</button>
+  <button class="tab" onclick="show('a3', this)">Approach 3 impact</button>
+  <button class="tab" onclick="show('new', this)">New optimal design</button>
+  <button class="tab" onclick="show('risk', this)">Risk assessment</button>
+</div>
+
+<!-- WHAT HYPURA DOES -->
+<div id="what" class="panel active">
+  <div class="section-label">Three-tier memory scheduler</div>
+  <div class="tier-row">
+    <div class="tier-box t-gpu">
+      <div class="tier-name">GPU (Metal)</div>
+      <div class="tier-sub">Fastest. Attention layers, active MoE experts, most-accessed tensors. All models — this tier first.</div>
+    </div>
+    <div class="tier-box t-ram">
+      <div class="tier-name">RAM overflow</div>
+      <div class="tier-sub">Second tier. FFN weights that don't fit GPU. Spills here before NVMe. ~3–4 GB available on 8 GB Air alongside OS.</div>
+    </div>
+    <div class="tier-box t-nvme">
+      <div class="tier-name">NVMe stream</div>
+      <div class="tier-sub">For models exceeding RAM. Read-only pread() with F_NOCACHE — no SSD write wear. Weights streamed on demand.</div>
+    </div>
+  </div>
+
+  <div class="section-label">What this unlocks vs. vanilla Ollama</div>
+  <div class="card">
+    <div style="padding: 4px 0;">
+      <div class="unlock-row"><div class="unlock-label">Dense 7B / 8B model</div><div class="unlock-before">~4.5 GB, fits GPU</div><div class="unlock-after" style="color:#27500A">No change — zero overhead</div></div>
+      <div class="unlock-row"><div class="unlock-label">Mixtral 8x7B (MoE)</div><div class="unlock-before">OOM crash on 8 GB</div><div class="unlock-after" style="color:#0C447C">Runs via expert streaming</div></div>
+      <div class="unlock-row"><div class="unlock-label">Llama 3 70B</div><div class="unlock-before">OOM crash on 8 GB</div><div class="unlock-after" style="color:#0C447C">0.3 tok/s via NVMe stream</div></div>
+      <div class="unlock-row"><div class="unlock-label">Mixtral 8x7B on 16 GB</div><div class="unlock-before">Borderline / crash risk</div><div class="unlock-after" style="color:#27500A">2.2 tok/s, stable</div></div>
+      <div class="unlock-row"><div class="unlock-label">Llama 3 70B on 16 GB</div><div class="unlock-before">OOM crash</div><div class="unlock-after" style="color:#0C447C">Possible via NVMe stream</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">The two streaming modes Hypura uses</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+    <div class="card">
+      <div class="card-title">Expert streaming (MoE models)</div>
+      <div class="card-body">For Mixtral and similar MoE models. Only the ~2 active experts out of 8 are loaded per token. 99.5% neuron cache hit rate. This is the most efficient mode — only a fraction of weights are ever active.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">FFN streaming (dense models)</div>
+      <div class="card-body">For Llama 70B and similar dense models. FFN layer weights streamed from NVMe through a dynamic pool buffer. Prefetch depth auto-scales with available RAM. Slower but works on any model.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APPROACH 1 IMPACT -->
+<div id="a1" class="panel">
+  <div class="big-banner bb-green">
+    <div class="bb-title">Approach 1 — strongly positive fit</div>
+    <div class="bb-body">Hypura slots in as a drop-in replacement for Ollama and removes the quality ceiling. The single-model architecture becomes dramatically more powerful without any changes to the orchestrator, RAG, or story bible.</div>
+  </div>
+
+  <div class="section-label">What changes</div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Quality ceiling removed.</strong> Instead of Mistral 7B (~7B params), you can now run Mixtral 8x7B (~47B effective params, MoE) as the single model. This is a massive prose quality jump — closer to GPT-4-level creative output on consumer hardware.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Crash concern directly solved.</strong> OOM errors — the thing that would kill a 3-hour generation job mid-chapter — become graceful NVMe streaming events. The engine keeps running.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Zero overhead for models that fit in GPU+RAM.</strong> If you run 7B or 8B, Hypura adds no latency. You keep full Metal speed. The benefit is only activated when you push beyond GPU memory.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>NVMe streaming speed trade-off.</strong> Running Mixtral 8x7B via Hypura on 8 GB hardware means expert streaming from SSD. Slower than GPU-resident, but you said speed isn't a concern — this is a direct match for your priorities.</div></div>
+
+  <div class="section-label">Revised inference layer</div>
+  <div class="flow-strip">
+    <div class="flow-node fn-gray">Python orchestrator</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-teal">Hypura serve (Ollama-compatible)</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-purple">Mixtral 8x7B or Llama 70B</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-green">GPU + RAM + NVMe tiers</div>
+  </div>
+  <div style="font-size: 13px; color: var(--color-text-secondary);">Everything else in Approach 1 (RAG, story bible, orchestrator, output pipeline) is unchanged. Hypura only replaces Ollama.</div>
+</div>
+
+<!-- APPROACH 2 IMPACT -->
+<div id="a2" class="panel">
+  <div class="big-banner bb-green">
+    <div class="bb-title">Approach 2 — strongly positive, especially for stability</div>
+    <div class="bb-body">Multi-agent makes many sequential model calls — a crash midway through a novel is devastating. Hypura's OOM prevention is the most valuable thing you can add to this approach. And every agent (Architect, Writer, Editor) runs at dramatically higher model quality.</div>
+  </div>
+
+  <div class="section-label">What changes</div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Crash prevention across hundreds of calls.</strong> A 100K-word novel in multi-agent mode involves 500–2000 model calls. One OOM crash loses hours of work. Hypura makes each call fail-safe.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Editor agent quality leaps.</strong> An editor running at Mixtral 8x7B or 70B quality catches far more subtle issues — character voice drift, logical plot holes, thematic inconsistency — than a 7B editor can.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Same model, better everything.</strong> All five agents (Architect, Planner, Writer, Editor, Memory Manager) share the same larger model. No additional orchestration complexity — just swap Ollama for Hypura.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>Generation time multiplies.</strong> Multi-agent already runs 3–5× more model calls. A 70B model at 0.3 tok/s is very slow per call. For a 100K-word novel this could be 24–72 hours of wall-clock time. Since speed is not your concern, this is fine — but the machine needs to stay awake and stable that entire time, which is exactly what Hypura enables.</div></div>
+
+  <div class="section-label">Recommended addition for long runs</div>
+  <div class="card">
+    <div class="card-title">Checkpoint-resume system</div>
+    <div class="card-body">Because multi-agent + large model = very long runs, add a checkpoint file written after every completed scene. If anything external kills the process (power, macOS sleep), the orchestrator picks up from the last checkpoint rather than restarting. Hypura prevents OOM crashes; checkpointing protects against everything else.</div>
+  </div>
+</div>
+
+<!-- APPROACH 3 IMPACT -->
+<div id="a3" class="panel">
+  <div class="big-banner bb-amber">
+    <div class="bb-title">Approach 3 — Hypura partially collapses this approach</div>
+    <div class="bb-body">The core motivation for Approach 3 was the RAM budget: swap a small structural model in when the large prose model is unloaded. With Hypura handling memory across GPU/RAM/NVMe, that constraint largely disappears — you may not need two models at all. But there's a refined version of the dual-model idea that still makes sense.</div>
+  </div>
+
+  <div class="section-label">What changes</div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>The model swap is no longer forced by RAM.</strong> Without Hypura, you had to evict the prose model to load the structural model. With Hypura, one large model can stay resident (even if it spills to NVMe) and handle both roles.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-new">*</div><div class="impact-text"><strong>A refined dual-model design still has merit.</strong> Using a tiny Phi-3 Mini (2 GB, fits entirely in GPU RAM) for structural tasks means near-instant outline generation, bible updates, and coherence checking — these operations are fast even during a long prose generation session. You don't have to evict anything.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Hypura serves the prose model; Phi-3 runs natively via Ollama.</strong> The two servers can co-exist. Phi-3 in standard Ollama (GPU-only, ~2 GB). Mixtral or 70B in Hypura (all three tiers). No swap needed — both are always available.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>On 8 GB Air, co-resident is tight.</strong> Phi-3 in GPU (~2 GB) + Mixtral 8x7B in Hypura (GPU+RAM+NVMe) could pressure the ~3–4 GB of available RAM. Mitigation: run them serially (structural call first, prose call second) so only one is active at a time. Hypura's eviction is graceful, not crashy.</div></div>
+
+  <div class="section-label">Revised Approach 3 with Hypura</div>
+  <div class="flow-strip">
+    <div class="flow-node fn-purple">Phi-3 Mini via Ollama</div>
+    <div class="arr">→ structural tasks →</div>
+    <div class="flow-node fn-blue">Mixtral 8x7B via Hypura</div>
+    <div class="arr">→ prose only</div>
+  </div>
+  <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 6px;">No model swap latency. No memory eviction overhead. Each server handles its lane independently. Hypura's three-tier scheduler manages the large model's memory automatically.</div>
+</div>
+
+<!-- NEW OPTIMAL DESIGN -->
+<div id="new" class="panel">
+  <div class="big-banner bb-purple">
+    <div class="bb-title">The design Hypura makes possible — new Approach 4</div>
+    <div class="bb-body">Combining the best of all three approaches, with Hypura as the inference foundation and quality as the only goal, this is the architecture that would not have been feasible without it.</div>
+  </div>
+
+  <div class="section-label">The stack</div>
+  <div class="card" style="margin-bottom: 8px;">
+    <div class="card-title">Structural model — Phi-3 Mini 3.8B <span class="badge b-green" style="margin-left: 6px;">always resident in GPU</span></div>
+    <div class="card-body">Runs in standard Ollama on Metal. Handles: story bible, outlines, chapter plans, scene beats, coherence checking, timeline validation, bible updates. All structured JSON. Near-instant response (~20–40 tok/s). Never touches NVMe.</div>
+  </div>
+  <div class="card" style="margin-bottom: 8px;">
+    <div class="card-title">Prose model — Mixtral 8x7B (8 GB) or Llama 3 70B (16 GB) <span class="badge b-purple" style="margin-left: 6px;">Hypura managed</span></div>
+    <div class="card-body">Runs in Hypura. Only invoked for prose generation — the writer agent role. MoE expert streaming on 8 GB Air yields ~47B-equivalent prose quality. On 16 GB Air, Llama 70B via FFN streaming. Speed is irrelevant — quality is everything.</div>
+  </div>
+  <div class="card" style="margin-bottom: 8px;">
+    <div class="card-title">Multi-agent roles <span class="badge b-blue" style="margin-left: 6px;">same model, different system prompts</span></div>
+    <div class="card-body">Architect + Planner + Editor + Memory Manager all use Phi-3 Mini (fast, structural). Writer agent alone uses the large Hypura model. The editor makes a second pass using the large model for literary quality checking — this is where Mixtral/70B catches subtle voice drift and pacing problems a 3B model would miss.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Checkpoint + crash recovery</div>
+    <div class="card-body">Every completed scene writes a checkpoint JSON to disk. The orchestrator can be interrupted and resumed at any scene boundary. Combined with Hypura's OOM prevention, this makes the system resilient to virtually any failure mode.</div>
+  </div>
+
+  <div class="section-label">Full pipeline</div>
+  <div class="flow-strip">
+    <div class="flow-node fn-gray">Seed prompt</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-purple">Phi-3: Architect (bible + outline)</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-purple">Phi-3: Planner (scene beats)</div>
+  </div>
+  <div class="flow-strip">
+    <div class="flow-node fn-teal">RAG fetch (ChromaDB)</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-blue">Mixtral / 70B: Writer (prose)</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-blue">Mixtral / 70B: Editor (quality pass)</div>
+  </div>
+  <div class="flow-strip">
+    <div class="flow-node fn-purple">Phi-3: Memory Mgr (bible update)</div>
+    <div class="arr">→</div>
+    <div class="flow-node fn-amber">Checkpoint write</div>
+    <div class="arr">→ loop next scene</div>
+  </div>
+
+  <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 8px; line-height: 1.6;">This design uses Phi-3 for everything that doesn't need creative power (fast, free, no NVMe), and the large model only for prose and literary editing (slow, powerful, Hypura-managed). The result is the highest possible prose quality with the smallest possible crash surface.</div>
+</div>
+
+<!-- RISK ASSESSMENT -->
+<div id="risk" class="panel">
+  <div class="section-label">What's exciting</div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Directly solves your crash concern.</strong> This is what Hypura was built for — preventing OOM errors on Apple Silicon. It degrades gracefully to NVMe rather than hard-crashing.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Read-only NVMe access.</strong> Uses pread() with F_NOCACHE flag — no write cycles, no SSD wear. A novel generation job that runs 48 hours won't degrade your drive.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Zero overhead when models fit in GPU+RAM.</strong> For a 7B or 8B model on 16 GB, Hypura runs at identical speed to Ollama. The overhead only appears when you're already beyond memory limits.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-plus">+</div><div class="impact-text"><strong>Respected endorsers.</strong> Jonathan Ragan-Kelley (MIT, co-creator of Halide), Jeff Hammerbacher (Cloudera co-founder), and Georgi Gerganov (author of llama.cpp itself) have all starred this project.</div></div>
+
+  <div class="section-label">What to watch carefully</div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>Very new project — 1 month old.</strong> The README notes the code was generated via prompts and called "an exploration." This means edge cases in untested model architectures could still cause crashes. Always test with --max-tokens 10 on any new model before running a full generation job.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>Requires building from Rust source.</strong> No Homebrew tap yet (planned). You need Rust 1.75+ and CMake. One extra setup step but not technically difficult. A Homebrew tap will likely appear within months given its trajectory.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>Inactive on PRs/issues (current snapshot).</strong> The project has 5 open PRs and 3 issues in 30 days but responsiveness is listed as inactive. Community support may be limited if you hit a bug on an unusual model.</div></div>
+  <div class="impact-row"><div class="impact-icon icon-warn">!</div><div class="impact-text"><strong>Mitigation for all of the above:</strong> Keep Ollama installed alongside Hypura. Your orchestrator code should be able to fall back to Ollama (with a smaller model) if Hypura fails to load a specific model. Two-line config change.</div></div>
+
+  <div class="section-label">Bottom line for your use case</div>
+  <div class="big-banner bb-green" style="margin-top: 0;">
+    <div class="bb-title">Use Hypura — it's the right tool and the fit is near-perfect</div>
+    <div class="bb-body">Your priorities are quality and stability, not speed. Hypura directly addresses both: crash prevention by design, and model-size ceiling removal for quality. The youth of the project is real, but the fallback (Ollama + smaller model) is trivial to build. Start with a validated model (Mixtral 8x7B — confirmed working per the docs) before attempting 70B.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>

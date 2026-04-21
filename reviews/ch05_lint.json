@@ -1,0 +1,42 @@
+{
+  "passed": false,
+  "checks": [
+    {
+      "name": "duplicate_paragraphs",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "name": "repeated_sentences",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "name": "meta_awareness",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "name": "brief_event_flow",
+      "passed": false,
+      "violations": {
+        "missing_events": [
+          "Mara receives contradictory evidence about her sister.",
+          "Ivo reveals a risky lead.",
+          "A decision closes one path and opens a costlier one."
+        ],
+        "in_order": false
+      }
+    },
+    {
+      "name": "chapter1_reveal_gates",
+      "passed": true,
+      "violations": []
+    },
+    {
+      "name": "chapter1_opening_contract",
+      "passed": true,
+      "violations": []
+    }
+  ]
+}

@@ -1,0 +1,634 @@
+﻿================================================================================
+THE STORY ENGINE
+A Repeatable Framework for Building Any Multi-Chapter Story with an LLM
+================================================================================
+
+HOW THIS WORKS
+This framework runs in 4 Phases. Each phase produces a document you keep. By the
+end of Phase 4, you have everything you need to write every chapter.
+
+PHASE 1 — Story DNA        (10 questions → your core concept)
+PHASE 2 — Story Bible      (characters, world, tone, rules)
+PHASE 3 — Chapter Blueprint (chapter-by-chapter outline with cliffhangers)
+PHASE 4 — Writing Prompts  (scene-by-scene prompts for your LLM)
+
+You can run all four phases in one session or spread them across multiple
+sessions. Every phase produces output you save before moving to the next one.
+
+================================================================================
+PHASE 1 — STORY DNA
+================================================================================
+Paste this into your LLM first. Answer the questions. Save the output.
+________________________________________________________________________________
+
+You are a story development consultant helping me design a multi-chapter novel
+or novella from scratch.
+
+Ask me the following 10 questions, one at a time. Wait for my answer before
+asking the next one. After I answer all 10, produce a STORY DNA SUMMARY in the
+format shown below.
+
+THE 10 QUESTIONS:
+
+1. GENRE: What genre or genre combination interests you?
+   (Examples: mystery/thriller, romance, historical fiction, science fiction,
+   fantasy, horror, adventure, literary fiction, western, spy thriller — or a
+   combination like "mystery with romance" or "sci-fi with family drama")
+
+2. SETTING & INCITING MECHANISM: What kind of world or environment feels right?
+   AND what is the specific, physical reason this group of people is in this
+   location together? (Examples: a clinical trial paying $500 cash, a bus that
+   broke down in a snowstorm, a mandatory corporate retreat, an inheritance
+   reading at a remote estate.)
+
+3. TIME PERIOD: When is this story set?
+   (Past / present / future — if past or future, roughly when?)
+
+4. CENTRAL CONFLICT: What is the engine of the story?
+   (Examples: a crime to solve, a secret to uncover, a journey to complete,
+   a relationship to save, a war to survive, an identity to discover)
+
+5. EMOTIONAL CORE: What feeling do you want readers to carry when it's over?
+   (Examples: hope, grief, justice, wonder, love, fear, redemption,
+   the world is more complex than I thought)
+
+6. PROTAGONIST: Give me the protagonist's **core wound** (a past trauma that
+   shapes their present), their **self-sabotaging habit** (how they avoid
+   healing), and their **hidden desire** (what they secretly want vs. what
+   they claim to want).
+   (Example: 'Core wound: Abandoned by mother at 8. Self-sabotaging habit:
+   Overworks to avoid intimacy. Hidden desire: To be chosen unconditionally,
+   but claims to want "success."')
+
+7. ANTAGONIST OR OBSTACLE: What stands in the protagonist's way?
+   (Can be a person, a system, a force of nature, the protagonist's own
+   psychology, or a combination)
+
+8. SECONDARY THREADS: Beyond the central conflict, what other threads do you
+   want? (Examples: a love story, a friendship tested, a family secret,
+   a moral dilemma, a coming-of-age arc — pick 1 or 2)
+
+9. TONE AND CONTENT RULES: What do you want to avoid?
+   (Examples: graphic violence, explicit romance, profanity, dark themes,
+   political content, religious content — be honest, this shapes everything)
+
+10. LENGTH: How long do you want the story?
+    (Short: 5–7 chapters / Medium: 8–12 chapters / Long: 13–20 chapters)
+
+________________________________________________________________________________
+
+After receiving all 10 answers, produce this document:
+
+________________________________________________________________________________
+STORY DNA SUMMARY
+Title idea: [suggest 3 options]
+Genre:
+Time period:
+Setting (one paragraph):
+Central conflict (one sentence):
+Emotional core:
+Protagonist (name + 3-sentence profile):
+Antagonist/obstacle (name + 2-sentence profile):
+Secondary threads:
+Tone rules (what this story will and won't do):
+Chapter count:
+Estimated total word count: [calculate: chapters × 2,800 avg]
+
+LOGLINE (one sentence that captures the whole story):
+________________________________________________________________________________
+
+BONUS: GENRE CALIBRATION REPORT
+Based on the Genre identified in Phase 1, the LLM will now produce this
+reference guide to inform Phase 2 and 3 decisions.
+
+[LLM INSTRUCTION: Using the genre declared in the Story DNA, generate the
+following structural recommendations. Use industry standards and narrative
+theory to justify the suggestions.]
+
+1. CHAPTER ARCHITECTURE
+   - Recommended Chapter Count: [e.g., Thriller: 12-15 short chapters /
+     Epic Fantasy: 20-25 longer chapters / Romance: 18-22 balanced chapters]
+   - Recommended Word Count per Chapter: [e.g., Thriller: 2,000-2,500 words
+     (fast pace) / Literary: 3,500-4,500 words (deeper immersion)]
+   - Pacing Philosophy: [e.g., Mystery: "Ratchet tension every 3 chapters" /
+     Romance: "Alternate POV chapters for yearning"]
+
+2. CAST SIZE & ROLES
+   - Minimum Viable Cast: [Number of essential characters for this genre]
+   - Maximum Recommended Cast: [When does the reader get confused?]
+   - Archetype Alert: [List 2-3 common archetypes in this genre that the story
+     should either USE or SUBVERT (e.g., "The Hardboiled Detective," "The
+     Chosen One Farmboy," "The Best Friend Who Gives Advice").]
+
+3. SETTING & WORLDBUILDING DEPTH
+   - Level of Detail Required: [Low (Contemporary Realism) / Medium (Near-
+     Future Sci-Fi) / High (Secondary World Fantasy)]
+   - Specific Sensory Anchors: [What details matter in this genre? e.g.,
+     "Gothic Horror: Texture of decay, sound of wind." "Cyberpunk: Smell of
+     street food, glare of neon on wet pavement."]
+
+4. TONE CALIBRATION (Auto-Populated Rules)
+   - Violence Threshold: [e.g., Cozy Mystery: Off-screen only. Thriller:
+     On-screen but not gratuitous.]
+   - Romance Threshold: [e.g., Closed Door vs. Open Door]
+   - Profanity Threshold: [None / Mild / Realistic]
+
+SAVE THIS REPORT. Use it to answer questions about chapter length and cast
+size in Phase 2 and Phase 3.
+________________________________________________________________________________
+
+Save this summary before moving to Phase 2.
+
+================================================================================
+PHASE 2 — STORY BIBLE
+================================================================================
+Paste your Phase 1 summary + this prompt. Save the output.
+________________________________________________________________________________
+
+Here is my Story DNA Summary:
+
+[PASTE YOUR PHASE 1 OUTPUT HERE]
+
+Using this summary, build a complete STORY BIBLE. The story bible is the
+document I will paste at the start of every writing session to keep my LLM
+focused. It should include:
+
+1. SETTING PROFILE (with Genre-Specific Depth)
+Write one full paragraph describing the story's world, location, and atmosphere.
+- Physical details (geography, architecture, climate, time period visuals)
+- Social details (who lives here, what tensions exist, what is the culture)
+- The "feel" of the setting (what emotion does this place produce in the reader)
+
+[LLM NOTE: If Genre Calibration Report indicates HIGH Worldbuilding Depth,
+also generate the following sub-section:]
+- RULES OF THE WORLD: 3-5 bullet points defining the unique "physics" or "laws"
+  of this setting. (e.g., "Magic requires blood," "The Emperor is never seen in
+  public," "No one leaves the town after sunset.")
+- LOCATION GLOSSARY: 3 key locations (with one sensory detail each) that will
+  serve as recurring backdrops. (e.g., "The Rusted Cog Tavern - smells of
+  spilled ale and copper.")
+
+2. CHARACTER ROSTER
+For each character, provide:
+- Name and age
+- Role (protagonist / antagonist / supporting / expendable / red herring)
+- Core wound: How a past trauma manifests in current behavior (e.g., 'Flies
+  into rage when criticized → abandoned as a child').
+- Flawed belief: A lie they tell themselves (e.g., 'If I'm perfect, people
+  will stay').
+- 3-sentence profile: who they are, what they want (externally), what they hide
+- Voice note: one sentence describing how they speak and carry themselves
+- Story function: what narrative job does this character perform?
+- Cost of change: What must they sacrifice or lose to grow? (e.g., 'His sense
+  of total control').
+
+Include at minimum:
+  - 1–2 protagonists
+  - 1 antagonist (person, institution, or force)
+  - 2–3 supporting characters
+  - 1 expendable character (someone whose death or loss raises the stakes —
+    optional but recommended)
+  - 1 red herring character (someone the reader suspects incorrectly —
+    optional but recommended for mystery/thriller)
+
+Flag any character lacking a specific core wound or flawed belief. These are
+mandatory for protagonists and major supporting cast.
+
+3. TONE AND STYLE RULES
+A list of 8–12 rules for how this story should be written. Include:
+- Point of view (first person / third person limited / third person omniscient)
+- Tense (past / present)
+- Dialogue style (long and flowing / short and clipped / somewhere between)
+- Pacing philosophy (slow burn / fast / varied)
+- What this story does well (atmosphere, tension, character interiority,
+  action, etc.)
+- What this story explicitly avoids (based on the content rules from Phase 1)
+
+4. THEME STATEMENT
+One paragraph on what this story is really about beneath the plot.
+What human truth does it explore? What question does it ask that it may or may
+not answer?
+
+5. THREE-ACT SKELETON
+A high-level structural map:
+- Act 1 (chapters 1 to ~25% of total): Setup, inciting incident, world
+  established
+- Act 2 (chapters ~25%–75%): Escalation, complications, reversals, darkest
+  moment
+- Act 3 (chapters ~75%–end): Climax, resolution, final emotional beat
+
+6. RELATIONSHIP TENSION MAP
+A brief matrix of the key dynamics. This ensures every character has a purpose
+beyond being "helper" or "obstacle."
+Format: [Character A] + [Character B] = [Core Tension/Secret]
+Examples:
+- Eli + Mara = "Attraction complicated by hidden knowledge of the experiment."
+- Eli + Jonah = "Eli wants to plan; Jonah wants to act."
+- Lena + Staff = "Lena notices they are being observed rather than treated."
+
+Save this story bible before moving to Phase 3.
+
+================================================================================
+PHASE 3 — CHAPTER BLUEPRINT
+================================================================================
+Paste your Story Bible + this prompt. Save the output.
+________________________________________________________________________________
+
+Here is my Story Bible:
+
+[PASTE YOUR PHASE 2 OUTPUT HERE]
+
+Using this story bible, build a complete CHAPTER BLUEPRINT for my [X]-chapter
+story.
+
+CRITICAL RULE FOR ACT 1: For Chapters 1-3, the focus must be on establishing
+character through flawed action, not exposition. The inciting incident may
+occur, but the protagonist's reaction to it—driven by their core wound and
+flawed belief—is the primary focus. Avoid generic setting description; every
+environmental detail must reveal character.
+
+For EVERY chapter, provide:
+
+CHAPTER [N] — "[Title]"
+Word target: [2,500–3,500 for most chapters; allow up to 4,000 for climax]
+Scene count: [2–3 scenes per chapter]
+POV: [which character's perspective leads this chapter]
+Act position: [Act 1 / Act 2 / Act 3]
+
+CENTRAL QUESTION: What does this chapter need to answer or advance?
+
+SCENE ZERO (The 60-Second Lead-In): [One sentence describing the physical
+action the POV character was doing just before Scene 1 opens. This is NOT a
+flashback. It establishes causality and grounds the reader in a specific
+moment. Example: Eli just signed the intake form and pocketed the pen. OR
+Eli was just told to wait in a specific chair and chose a different one.]
+
+SCENE BREAKDOWN:
+- Scene 1: [location + what happens]
+   - REVERSAL (Yes, But... / No, And...): [State explicitly how the situation
+     changes from the start to the end of this scene using this formula:
+     - START STATE: Character wants X. They have Y.
+     - ACTION: Character tries Z.
+     - OUTCOME: YES, BUT (they succeed but a complication arises) OR NO, AND
+       (they fail and the situation worsens).
+     Example: START: Eli wants to stay anonymous. ACTION: Eli lies about
+     memory gaps. OUTCOME: YES, BUT the nurse replies, "That's exactly what
+     the last subject said."]
+- Scene 2: [location + what happens]
+   - REVERSAL (Yes, But... / No, And...): [Same format as above]
+- Scene 3 (if applicable): [location + what happens]
+   - REVERSAL (Yes, But... / No, And...): [Same format as above]
+
+THREAD PROGRESS:
+- [Main plot thread]: [how it advances]
+- [Secondary thread 1]: [how it advances]
+- [Secondary thread 2 if applicable]: [how it advances]
+
+CHARACTER BEAT (Flawed Choice): [Which character's flawed choice drives this
+chapter? Describe the specific, active choice they make based on their flawed
+belief and its immediate consequence. Must be an action (e.g., lying, hiding
+evidence, accusing someone) not a feeling (e.g., "feels sad").]
+
+ACTION BEAT (MANDATORY KINETIC EVENT): [Describe ONE specific, visible movement
+of the body or an object that changes the physical state of the scene. This
+CANNOT be "looking" or "noticing." It must be doing. Examples: Slides the
+drawer shut and locks it. Ducks under the awning as the rain starts. Snatches
+the paper before the other person can read it. Checks the lock on the door
+three times. If a scene draft contains the POV character only sitting/thinking
+/looking for >300 words, it must be revised to include this beat.]
+
+EMOTIONAL BEAT: [What is the emotional shift the reader experiences in this
+chapter? Track the movement from one feeling to another (e.g., Curiosity →
+Unease).]
+
+INTERIORITY BEAT (Core Wound Connection): [What key internal realization,
+memory, or fear arises for the POV character? This must tie directly to their
+Core Wound. Crucially, this interior moment must be triggered by the ACTION
+BEAT or REVERSAL above, not by idle reflection.]
+
+CLIFFHANGER (CONSEQUENCE-DRIVEN): [The final beat. This must be a physical or
+social consequence of the CHARACTER BEAT or ACTION BEAT above. Do not end on
+an internal thought ("Eli wondered..."). End on a visible change in the
+environment or a specific piece of dialogue that demands an immediate answer.
+- BAD: Eli felt a growing sense of dread.
+- GOOD: The intercom clicked on. "Eli Vance. Report to Medical."
+- GOOD: The door Eli just locked... clicked open on its own.
+Write the cliffhanger in 2-3 concrete sentences. This cliffhanger must be a
+direct, visible result of the character's flawed choice in this chapter.]
+
+________________________________________________________________________________
+
+After all chapters are outlined, produce:
+
+STORY STRUCTURE MAP
+A summary table showing how each chapter serves the three acts, which threads
+are active, and when the major turning points occur.
+
+CLIFFHANGER AUDIT
+Review all cliffhangers. Flag any that:
+- Repeat the same type (e.g., three "mysterious text message" cliffhangers in a
+  row)
+- Land too weakly (hint without specificity)
+- Give away too much too early
+Suggest replacements for any flagged cliffhangers.
+
+DEPTH AUDIT
+Review Chapters 1-3 and flag the following:
+- Any scene where the protagonist is a passive observer.
+- Any "Character Beat" that is passive (e.g., "feels sad") instead of active
+  (e.g., "destroys evidence").
+- Any cliffhanger that is a random external event instead of a consequence of
+  a character's flaw.
+- Any chapter lacking a clear REVERSAL (Yes, But/No, And) that escalates the
+  situation.
+Suggest concrete replacements for any flagged items.
+
+Save this blueprint before moving to Phase 4.
+
+================================================================================
+PHASE 4 — WRITING PROMPTS
+================================================================================
+Paste your Chapter Blueprint + this prompt. Save the output.
+________________________________________________________________________________
+
+Here is my Chapter Blueprint:
+
+[PASTE YOUR PHASE 3 OUTPUT HERE]
+
+And here is my Story Bible for reference:
+
+[PASTE YOUR PHASE 2 OUTPUT HERE]
+
+Using both documents, build a complete WRITING PROMPT PACKAGE. This is the
+document I will use during actual chapter writing with my LLM.
+
+The package should contain, in this order:
+
+________________________________________________________________________________
+
+SECTION 1: MASTER SYSTEM PROMPT
+A single block of text (clearly marked) that I paste at the start of every
+writing session. It should include:
+- Story title and genre
+- One-paragraph story summary
+- Complete character list with voice notes
+- All tone and style rules
+- POV and tense reminder
+- Chapter length targets
+- The content rules (what to avoid)
+- GOLDEN RULE: CAUSALITY FIRST.
+  1. Do not state an emotion directly. Reveal it through physical sensation or
+     action.
+  2. CRITICAL: Every scene must answer "Why is this character in this specific
+     spot right now?" within the first 3 paragraphs. The answer must be a
+     physical action or a specific piece of dialogue that just occurred (e.g.,
+     "They were told to wait here." / "They followed the sound of the alarm.").
+  3. Weave backstory and motivation into movement. If a character remembers the
+     past, they must do so while opening a door or picking up an object. Never
+     in stillness.
+  4. Ban the words "felt like" and "seemed to" when describing the POV
+     character's own experience. Replace with concrete nouns and verbs.
+This block should be self-contained — everything the LLM needs to stay on track
+without reading any other document.
+
+________________________________________________________________________________
+
+SECTION 2: CHAPTER LENGTH GUIDE
+A reference table showing:
+- Words per chapter (range and target)
+- Paragraphs per chapter (range)
+- Scenes per chapter (range)
+- Dialogue exchanges per chapter (range)
+- Cliffhanger length (in sentences)
+- How to handle longer or shorter chapters
+
+________________________________________________________________________________
+
+SECTION 3: INDIVIDUAL CHAPTER PROMPTS
+For every chapter, one prompt block (clearly marked CHAPTER [N]) containing:
+
+CHAPTER CONTEXT (brief — 2–3 sentences orienting the LLM to where we are in
+the story)
+
+Then, for each scene in the chapter:
+
+SCENE [N] PROMPT — a complete, specific prompt block the LLM can act on
+directly. Each scene prompt must include:
+- Location and time of day
+- Who is present
+- What happens (the plot mechanics)
+- What flawed action the POV character takes (e.g., lying, avoiding a question,
+  choosing isolation)
+- What the scene must accomplish (its narrative job)
+- Any specific character beats, dialogue moments, or sensory details to include
+- Sensory details that reflect the POV character's emotional state (e.g., "The
+  rain sounded like a ticking clock" to show anxiety)
+- The emotional state that should carry through the scene
+- How the scene ends (transition line or setup for next scene)
+- A ban on purely descriptive adjectives for setting. Description must serve
+  character revelation.
+
+End each chapter prompt with:
+CLIFFHANGER INSTRUCTION — exact guidance on how to write the chapter's final
+beat, including what the reader should and should not understand at this
+moment. This cliffhanger must be a direct consequence of a character's flawed
+choice from earlier in the chapter.
+
+________________________________________________________________________________
+
+SECTION 4: UTILITY PROMPTS
+Four reusable helper prompts, written specifically for this story:
+
+1. CONTINUATION PROMPT — for when a scene comes out too short
+2. RESET ANCHOR — for when the LLM loses the tone or character voice (include
+   3 specific reminders based on this story's rules)
+3. SCENE TRANSITION PROMPT — for moving cleanly between scenes
+4. CLIFFHANGER SHARPENER — for tightening a weak chapter ending
+
+________________________________________________________________________________
+
+At the top of the complete document, include:
+- Story title
+- Genre
+- Total chapter count
+- Estimated total word count
+- A one-line note on the story's emotional core
+
+Save this as your working document. Open it every writing session.
+
+================================================================================
+QUICK REFERENCE CARD
+================================================================================
+Keep this visible whenever you run the framework.
+________________________________________________________________________________
+
+CHAPTER LENGTH STANDARDS
+
+| Story Type                  | Words/Chapter | Paragraphs | Scenes |
+|-----------------------------|---------------|------------|--------|
+| Fast thriller / action      | 2,000–2,800   | 18–26      | 2–3    |
+| Mystery / suspense          | 2,500–3,500   | 22–35      | 2–3    |
+| Literary / character drama  | 2,800–4,000   | 28–40      | 2–3    |
+| Romance                     | 2,500–3,500   | 24–36      | 2–3    |
+| Fantasy / sci-fi (world-heavy) | 3,000–4,500 | 28–45      | 2–4    |
+| Historical fiction          | 3,000–4,000   | 28–40      | 2–3    |
+| Horror                      | 2,000–3,500   | 20–35      | 2–3    |
+| Young adult                 | 2,000–3,000   | 20–30      | 2–3    |
+
+Universal rules:
+- Dialogue paragraphs are short (1–4 lines). Count them accordingly.
+- Climax chapters (typically 80–90% through the story) can run 10–15% longer.
+- Final chapters often run slightly shorter — resolution needs less real estate
+  than conflict.
+
+________________________________________________________________________________
+
+CHARACTER COUNT GUIDE BY STORY LENGTH
+
+| Chapter Count      | Minimum Characters | Recommended | Maximum |
+|--------------------|--------------------|-------------|---------|
+| 5–7 chapters       | 3                  | 5–6         | 7       |
+| 8–12 chapters      | 5                  | 7–9         | 11      |
+| 13–20 chapters     | 6                  | 10–13       | 16      |
+
+Character roles to consider for any story:
+- Protagonist (1–2) — drives the story
+- Antagonist (1) — creates the central obstacle
+- Ally (1–2) — supports protagonist, can be tested
+- Mentor or truth-teller (1) — optional; appears in Acts 1–2
+- Red herring (1) — optional; misdirects reader for multiple chapters
+- Expendable (1) — optional but powerful; death/loss raises real stakes
+- Informant or witness (1) — optional; provides information at a cost
+
+________________________________________________________________________________
+
+THE 7 CLIFFHANGER TYPES
+Rotate through these to avoid repetition across chapters.
+
+| Type                   | Description                                      | Example |
+|------------------------|--------------------------------------------------|---------|
+| Revelation             | A fact is discovered that reframes everything    | "The photograph was dated three years before they met." |
+| Threat                 | A direct danger appears or escalates             | The message reads only: "I know where you sleep." |
+| Betrayal               | Someone trusted proves untrustworthy             | She recognized the handwriting. It was his. |
+| Disappearance          | A person, object, or truth vanishes              | The file was gone. The drawer was empty. The room was clean. |
+| Wrong assumption exposed | The reader's belief is overturned               | She hadn't been running from him. She'd been running toward something else entirely. |
+| Impossible event       | Something that should not be possible occurs     | The phone rang. The number on the screen belonged to a dead man. |
+| Unfinished sentence    | A character is cut off at a critical moment      | "Don't trust—" The line went dead. |
+
+________________________________________________________________________________
+
+THREAD WEAVING RULES
+Every chapter should advance at least 2 threads. The main plot thread should
+advance in every chapter. Secondary threads can go quiet for 1–2 chapters but
+must resurface before readers forget them.
+
+Good thread rhythm for a 10-chapter story:
+- Chapters 1–3:   Establish all threads. Main plot dominates.
+- Chapters 4–5:   Secondary threads deepen. Main plot complicates.
+- Chapter 6:      Emotional/relationship thread peaks. Main plot pauses briefly.
+- Chapters 7–8:   Main plot accelerates. All threads converge.
+- Chapter 9:      All threads at maximum tension simultaneously.
+- Chapter 10:     All threads resolve — main plot first, emotional last.
+
+________________________________________________________________________________
+
+ACTION BEAT GUIDELINES
+For genres that include physical conflict, chase, or confrontation.
+
+Action beats work best when they are:
+- Grounded — in real physical space with real consequences
+- Short — 300–600 words maximum per beat
+- Purposeful — they must change the situation or reveal character
+- Varied — use different types across chapters (a chase, a confrontation, an
+  attack, a standoff)
+- Costly — someone should be hurt, cornered, or exposed afterward
+
+Place action beats at these structural moments:
+- End of Act 1 (around chapter 25%) — stakes become real
+- Mid-Act 2 (around chapter 50%) — darkest moment escalation
+- Late Act 2 (around chapter 75%) — everything closing in
+- Act 3 climax — the final confrontation or escape
+
+Avoid: action in consecutive chapters (it numbs the reader), action that
+resolves cleanly (it should cost something), action described from too far away
+(keep the camera close).
+
+________________________________________________________________________________
+
+THE SLOW-BURN ROMANCE ARC
+For any story with a romantic secondary thread. Use this 7-beat progression
+regardless of chapter count.
+
+| Beat                     | What Happens                                    | Never Say It Directly |
+|--------------------------|-------------------------------------------------|------------------------|
+| 1. Friction              | They meet as adversaries or strangers           | The reader should feel the charge before the characters do |
+| 2. Reluctant usefulness  | They need each other and resent it              | First cooperation. No warmth yet. |
+| 3. Accidental glimpse    | One sees the other unguarded                    | A moment of vulnerability, quickly covered |
+| 4. First trust           | One confides something true                     | Small. Not a declaration. A crack in the wall. |
+| 5. The choice            | One protects the other at personal cost         | This is the turn. The reader knows before the characters do. |
+| 6. The almost            | A moment interrupted or withdrawn               | Should be the most frustrating chapter in the book |
+| 7. The admission         | Something honest is said                        | Understate it. Let the reader do the work. |
+
+________________________________________________________________________________
+
+SESSION WORKFLOW
+Follow this every time you open your LLM to write.
+
+Step 1 — Paste the Master System Prompt
+Step 2 — Paste the Chapter Prompt you're working on
+Step 3 — Request Scene 1 only (not the whole chapter)
+Step 4 — Review, adjust, use Continuation or Reset prompts if needed
+Step 5 — Request Scene 2
+Step 6 — Repeat for Scene 3
+Step 7 — Request the cliffhanger separately if the LLM didn't nail it
+Step 8 — Save your chapter output before closing the session
+Step 9 — At the start of the next session, briefly summarize the previous
+         chapter in 2–3 sentences and paste it before the System Prompt as a
+         "Previously:" block
+
+The "Previously:" block is important. Local LLMs have no memory between
+sessions. A 2–3 sentence recap of the previous chapter keeps the narrative
+continuous and prevents the LLM from contradicting events that already happened.
+
+________________________________________________________________________________
+
+GENRE-SPECIFIC REMINDERS
+
+Mystery / Thriller
+- Plant all clues before chapter 75% — no new information in the finale
+- The antagonist must appear in Act 1, even if not identified as antagonist
+- Every red herring needs a logical explanation once cleared
+
+Romance
+- The central relationship must face at least one external obstacle and one
+  internal obstacle
+- The lowest point (almost-separation) should occur around chapter 80%
+- Resolution must be earned — no sudden personality changes
+
+Fantasy / Sci-Fi
+- Establish your world's rules in Act 1 and never break them in Act 3
+- Magic / technology solves problems only if introduced before the problem
+  appears
+- One new world-building element per chapter maximum
+
+Historical Fiction
+- Ground at least one detail per scene in documented historical fact
+- Characters can be fictional; events they witness should not contradict history
+- Research before writing, not after — anachronisms break the spell
+
+Horror
+- Threat should escalate in specificity, not just intensity
+- Safety must feel possible for fear to work — if everything is always
+  dangerous, nothing is scary
+- The worst thing usually happens slightly before the end, not at it
+
+Adventure
+- Each act should change the physical location significantly
+- The protagonist must fail meaningfully before the final success
+- Companions can be lost — lone arrival at the goal is more powerful than a
+  group finish
+
+================================================================================
+The Story Engine | Version 2.0 - Depth-Focused | Works with any LLM
+Designed for 5–20 chapter stories across all fiction genres
+================================================================================

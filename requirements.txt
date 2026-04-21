@@ -1,0 +1,15 @@
+python-dotenv
+requests
+httpx
+pydantic>=2.8
+sqlalchemy>=2.0
+alembic
+chromadb
+rich
+pyyaml
+tiktoken
+huggingface_hub
+gradio_client
+gradio
+pytest
+pytest-asyncio

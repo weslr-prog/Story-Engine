@@ -1,0 +1,35 @@
+{
+  "completed": [],
+  "manifest_version": 2,
+  "source_hash": "4610a50129272a51dc1f7984f94ca6f11eac189fd1987f37773ab328e78ecd31",
+  "sentence_count": 9,
+  "voice_sample": "voices/p233_023.wav",
+  "uploaded_voice_sample": "/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav",
+  "api_name": "/generate",
+  "backend": {
+    "root_url": "http://127.0.0.1:7865",
+    "api_prefix": "/gradio_api",
+    "endpoints": [
+      "/generate",
+      "/load_model"
+    ]
+  },
+  "pacing_profile": {
+    "intro_lead_in_seconds": 0.0,
+    "pause_multiplier_end": 1.0,
+    "pause_multiplier_mid": 0.7,
+    "pause_paragraph_bonus": 0.15
+  },
+  "failed": [
+    "seg_0000.wav",
+    "seg_0001.wav",
+    "seg_0002.wav",
+    "seg_0003.wav",
+    "seg_0004.wav",
+    "seg_0005.wav",
+    "seg_0006.wav",
+    "seg_0007.wav",
+    "seg_0008.wav"
+  ],
+  "last_error": "sentence 0: (\"Connection broken: TimeoutError('chapter 1 sentence 0 exceeded 180s')\", TimeoutError('chapter 1 sentence 0 exceeded 180s'))"
+}

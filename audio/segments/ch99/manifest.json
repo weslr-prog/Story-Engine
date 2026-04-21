@@ -1,0 +1,28 @@
+{
+  "completed": [
+    "seg_0000.wav"
+  ],
+  "manifest_version": 2,
+  "source_hash": "c441a21e4721f24b93ecd3d7438405477fc97c9640fb47b0ad0961a1af766061",
+  "sentence_count": 1,
+  "voice_sample": "/Users/wes/Desktop/Story-Engine/voices/p233_023.wav",
+  "uploaded_voice_sample": "/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav",
+  "api_name": "/generate",
+  "backend": {
+    "root_url": "http://127.0.0.1:7866",
+    "api_prefix": "/gradio_api",
+    "endpoints": [
+      "/generate",
+      "/load_model"
+    ]
+  },
+  "pacing_profile": {
+    "intro_lead_in_seconds": 0.0,
+    "pause_multiplier_end": 1.0,
+    "pause_multiplier_mid": 0.7,
+    "pause_paragraph_bonus": 0.15
+  },
+  "failed": [],
+  "last_error": "",
+  "last_generated": "/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/eb51851053b55bb317ccd90ae011eb9dd48602b2c06260fb28042c7feca86c76/audio.wav"
+}

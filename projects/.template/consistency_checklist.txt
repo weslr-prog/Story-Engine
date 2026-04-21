@@ -1,0 +1,23 @@
+# Consistency Checklist
+
+## Canon Facts
+- Character names, ages, and roles match `characters.json`.
+- Setting facts and world rules match `story_bible.json`.
+
+## Chapter Continuity
+- Chapter events align with `chapter_briefs.json` for this chapter.
+- Cause-and-effect chain is preserved from previous chapter.
+- No contradiction in timeline, injuries, possessions, or locations.
+
+## Character Integrity
+- Motivations reflect established core wounds and flawed beliefs.
+- Speech patterns stay consistent for each recurring character.
+
+## Reveal and Stakes Control
+- No premature major reveal before planned chapter.
+- Cliffhanger emerges from in-chapter character choices.
+
+## Output Quality
+- No duplicated paragraphs/sentences.
+- No meta narration about process/tools.
+- Chapter ending sets up next chapter clearly.

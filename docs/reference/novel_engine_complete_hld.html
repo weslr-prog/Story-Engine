@@ -1,0 +1,489 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:20px}
+.tab{padding:6px 13px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary);font-weight:500}
+.tab:hover:not(.active){background:var(--color-background-secondary)}
+.panel{display:none}.panel.active{display:block}
+.sec{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-secondary);margin:18px 0 9px}
+.sec:first-child{margin-top:0}
+.card{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);padding:13px 15px;margin-bottom:9px}
+.ct{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.cb{font-size:12px;color:var(--color-text-secondary);line-height:1.55}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.chip{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px}
+.cp{background:#EEEDFE;color:#3C3489}.ct2{background:#E1F5EE;color:#085041}.ca{background:#FAEEDA;color:#633806}
+.cb2{background:#E6F1FB;color:#0C447C}.cg{background:#EAF3DE;color:#27500A}.cgr{background:#F1EFE8;color:#444441}
+.cr{background:#FCEBEB;color:#501313}
+@media(prefers-color-scheme:dark){
+.cp{background:#26215C;color:#CECBF6}.ct2{background:#04342C;color:#9FE1CB}.ca{background:#412402;color:#FAC775}
+.cb2{background:#042C53;color:#B5D4F4}.cg{background:#173404;color:#C0DD97}.cgr{background:#2C2C2A;color:#D3D1C7}
+.cr{background:#501313;color:#F7C1C1}
+}
+.badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+.bg{background:#EAF3DE;color:#27500A}.ba{background:#FAEEDA;color:#633806}.bb{background:#E6F1FB;color:#0C447C}
+.bp{background:#EEEDFE;color:#3C3489}.bgr{background:#F1EFE8;color:#444441}
+@media(prefers-color-scheme:dark){
+.bg{background:#173404;color:#C0DD97}.ba{background:#412402;color:#FAC775}.bb{background:#042C53;color:#B5D4F4}
+.bp{background:#26215C;color:#CECBF6}.bgr{background:#2C2C2A;color:#D3D1C7}
+}
+.phase{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);margin-bottom:10px;overflow:hidden}
+.phase-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;background:var(--color-background-secondary)}
+.phase-hdr:hover{background:var(--color-background-tertiary)}
+.phase-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.phase-title{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
+.phase-meta{font-size:11px;color:var(--color-text-secondary);white-space:nowrap}
+.phase-body{padding:12px 14px;border-top:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);display:none}
+.phase-body.open{display:block}
+.task{display:flex;gap:8px;align-items:flex-start;margin-bottom:7px}
+.task:last-child{margin-bottom:0}
+.task-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.task-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5;flex:1}
+.task-text strong{color:var(--color-text-primary);font-weight:500}
+.dep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.dep-card{border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:10px 12px;background:var(--color-background-secondary)}
+.dep-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.dep-how{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.dep-cmd{font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary);margin-top:4px;word-break:break-all}
+.model-tier{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);margin-bottom:12px;overflow:hidden}
+.tier-hdr{padding:11px 14px;font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.tier-body{padding:0 14px 12px}
+.model-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.model-row:last-child{border-bottom:none}
+.mr-name{font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:200px}
+.mr-detail{font-size:11px;color:var(--color-text-secondary);flex:1;line-height:1.45}
+.quant-step{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.quant-step:last-child{border-bottom:none}
+.qs-num{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;background:#EEEDFE;color:#3C3489;margin-top:1px}
+@media(prefers-color-scheme:dark){.qs-num{background:#26215C;color:#CECBF6}}
+.qs-body{flex:1}
+.qs-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.qs-detail{font-size:11px;color:var(--color-text-secondary);line-height:1.5}
+.qs-cmd{font-size:10px;font-family:var(--font-mono);background:var(--color-background-secondary);padding:4px 8px;border-radius:var(--border-radius-md);margin-top:5px;color:var(--color-text-secondary);word-break:break-all;display:block}
+.arch-layer{border-radius:var(--border-radius-md);border:0.5px solid;padding:10px 14px;margin-bottom:6px}
+.al-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.al-body{font-size:12px;line-height:1.5}
+.al-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.al-p{background:#EEEDFE;border-color:#AFA9EC}.al-p .al-label{color:#534AB7}.al-p .al-body{color:#3C3489}
+.al-t{background:#E1F5EE;border-color:#5DCAA5}.al-t .al-label{color:#0F6E56}.al-t .al-body{color:#085041}
+.al-a{background:#FAEEDA;border-color:#EF9F27}.al-a .al-label{color:#854F0B}.al-a .al-body{color:#633806}
+.al-b{background:#E6F1FB;border-color:#85B7EB}.al-b .al-label{color:#185FA5}.al-b .al-body{color:#0C447C}
+.al-g{background:#EAF3DE;border-color:#97C459}.al-g .al-label{color:#3B6D11}.al-g .al-body{color:#27500A}
+.al-gr{background:#F1EFE8;border-color:#B4B2A9}.al-gr .al-label{color:#5F5E5A}.al-gr .al-body{color:#444441}
+@media(prefers-color-scheme:dark){
+.al-p{background:#26215C;border-color:#7F77DD}.al-p .al-label{color:#AFA9EC}.al-p .al-body{color:#CECBF6}
+.al-t{background:#04342C;border-color:#1D9E75}.al-t .al-label{color:#5DCAA5}.al-t .al-body{color:#9FE1CB}
+.al-a{background:#412402;border-color:#BA7517}.al-a .al-label{color:#EF9F27}.al-a .al-body{color:#FAC775}
+.al-b{background:#042C53;border-color:#378ADD}.al-b .al-label{color:#85B7EB}.al-b .al-body{color:#B5D4F4}
+.al-g{background:#173404;border-color:#639922}.al-g .al-label{color:#97C459}.al-g .al-body{color:#C0DD97}
+.al-gr{background:#2C2C2A;border-color:#888780}.al-gr .al-label{color:#B4B2A9}.al-gr .al-body{color:#D3D1C7}
+}
+</style>
+
+<h2 class="sr-only">Complete high-level design plan for offline autonomous novel writing engine with Hypura serve and TurboQuant imatrix quantization, including optimal LLMs, build order, and dependencies</h2>
+
+<div style="padding:1rem 0">
+
+<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">Offline autonomous novel engine · M1 MacBook Air · Hypura + TurboQuant</div>
+<div style="font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:20px">Complete build design</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('stack',this)">Full system stack</button>
+  <button class="tab" onclick="show('models',this)">Optimal LLMs</button>
+  <button class="tab" onclick="show('quant',this)">TurboQuant pipeline</button>
+  <button class="tab" onclick="show('build',this)">Build order</button>
+  <button class="tab" onclick="show('deps',this)">Dependencies</button>
+</div>
+
+<!-- FULL SYSTEM STACK -->
+<div id="stack" class="panel active">
+  <div class="sec">Input layer</div>
+  <div class="arch-layer al-gr">
+    <div class="al-label">User input</div>
+    <div class="al-body">2–5 sentence seed: premise, tone, genre, optional character names or constraints. CLI or simple web UI passes this to the orchestrator.</div>
+    <div class="al-chips"><span class="chip cgr">seed.txt</span><span class="chip cgr">CLI args</span><span class="chip cgr">genre flag</span></div>
+  </div>
+
+  <div class="sec">Orchestration layer</div>
+  <div class="arch-layer al-p">
+    <div class="al-label">Main orchestrator (Python FSM)</div>
+    <div class="al-body">Stateful finite state machine. States: INIT → OUTLINE → CHAPTER_PLAN → SCENE_WRITE → SCENE_EDIT → MEMORY_UPDATE → CHECKPOINT → NEXT_SCENE. Drives all agent calls. Manages checkpoint file. Handles fallback to Ollama if Hypura errors.</div>
+    <div class="al-chips"><span class="chip cp">Python 3.11+</span><span class="chip cp">asyncio</span><span class="chip cp">Pydantic v2</span><span class="chip cp">rich (progress)</span></div>
+  </div>
+
+  <div class="sec">Inference layer — two servers, always running</div>
+  <div class="arch-layer al-b">
+    <div class="al-label">Server A — Phi-3.5 Mini via Ollama (structural brain)</div>
+    <div class="al-body">Port 11434. Handles all structured JSON tasks: story bible generation, three-act outline, chapter plans, scene beats, coherence checks, timeline validation, bible updates. Runs entirely in GPU Metal. Near-instant. Never touches NVMe.</div>
+    <div class="al-chips"><span class="chip cb2">Ollama</span><span class="chip cb2">Phi-3.5 Mini 3.8B</span><span class="chip cb2">Q5_K_M · ~2.3 GB</span><span class="chip cb2">Metal GPU</span><span class="chip cb2">~25 tok/s</span></div>
+  </div>
+  <div class="arch-layer al-p">
+    <div class="al-label">Server B — Mixtral 8x7B or Llama 70B via Hypura serve (prose engine)</div>
+    <div class="al-body">Port 11435 (Ollama-compatible API). Handles only prose generation and literary editing. Hypura schedules attention layers to GPU, overflow to RAM, remaining weights streamed from NVMe. MoE expert streaming for Mixtral gives 99.5% cache hit rate. Zero overhead if model fits in GPU+RAM.</div>
+    <div class="al-chips"><span class="chip cp">Hypura serve</span><span class="chip cp">Mixtral 8x7B Q4_K_M · ~26 GB</span><span class="chip cp">MoE expert streaming</span><span class="chip cp">Metal + RAM + NVMe</span></div>
+  </div>
+
+  <div class="sec">Memory layer</div>
+  <div class="arch-layer al-t">
+    <div class="al-label">Hierarchical RAG — 3-tier retrieval (ChromaDB)</div>
+    <div class="al-body">Tier 1: Novel-level summary, always injected (~300 tokens). Tier 2: 3 adjacent chapter summaries, fetched by position (~600 tokens). Tier 3: Top-5 semantically similar scene chunks, fetched by cosine similarity (~800 tokens). Total injection budget capped at 1700 tokens regardless of novel length. Embeddings via nomic-embed-text (local, Ollama).</div>
+    <div class="al-chips"><span class="chip ct2">ChromaDB local</span><span class="chip ct2">nomic-embed-text</span><span class="chip ct2">HNSW index</span><span class="chip ct2">~200 MB RAM</span></div>
+  </div>
+  <div class="arch-layer al-a">
+    <div class="al-label">Story bible — structured narrative state (SQLite)</div>
+    <div class="al-body">Tables: Characters (name, traits, arc_state, relationships JSON), PlotThreads (id, status: open/active/resolved, description), WorldFacts (key, value, genre_scope), Timeline (event, chapter, scene, timestamp), ChapterState (complete, word_count, summary), GenreRules (magic system, crime timeline, etc). Pydantic v2 models enforce schema on every write.</div>
+    <div class="al-chips"><span class="chip ca">SQLite</span><span class="chip ca">SQLAlchemy 2.0</span><span class="chip ca">Pydantic v2</span><span class="chip ca">alembic migrations</span></div>
+  </div>
+
+  <div class="sec">Agent layer — 5 roles, same models</div>
+  <div class="arch-layer al-b">
+    <div class="al-label">Architect · Planner · Editor · Memory Manager → Phi-3.5 Mini</div>
+    <div class="al-body">All structured roles use the fast structural model. Architect builds the story bible and three-act outline. Planner expands each chapter into 4–8 scene beats with plot thread tracking. Editor reviews completed prose for coherence, not style. Memory Manager compresses scenes into summaries and updates the bible after each chapter.</div>
+    <div class="al-chips"><span class="chip cb2">system prompt per role</span><span class="chip cb2">JSON schema enforced</span><span class="chip cb2">Ollama port 11434</span></div>
+  </div>
+  <div class="arch-layer al-p">
+    <div class="al-label">Writer → Mixtral 8x7B / Llama 70B</div>
+    <div class="al-body">Prose generation only. Receives: scene beat from Planner, RAG context (1700 tokens), character voice guide, genre style prefix. Produces 600–1500 words per scene. Temperature 0.75. Top-p 0.92. No meta-commentary, no scene headings — raw prose only. Hypura port 11435.</div>
+    <div class="al-chips"><span class="chip cp">Hypura port 11435</span><span class="chip cp">temp 0.75</span><span class="chip cp">genre prefix injected</span></div>
+  </div>
+
+  <div class="sec">Resilience layer</div>
+  <div class="arch-layer al-g">
+    <div class="al-label">Checkpoint + crash recovery</div>
+    <div class="al-body">JSON checkpoint file written after every completed scene: {chapter_idx, scene_idx, bible_version, rag_index_hash, completed_prose_path}. On startup, orchestrator checks for checkpoint and resumes from last scene boundary. Hypura prevents OOM crashes; checkpointing covers everything else (power, sleep, network).</div>
+    <div class="al-chips"><span class="chip cg">checkpoint.json</span><span class="chip cg">atomic file writes</span><span class="chip cg">resume on start</span></div>
+  </div>
+  <div class="arch-layer al-g">
+    <div class="al-label">Fallback inference</div>
+    <div class="al-body">If Hypura serve fails to load the prose model (new GGUF, edge case), the orchestrator falls back to Ollama + Mistral 7B Q5_K_M automatically. One config flag. Output quality degrades but generation does not stop. Error logged with chapter/scene for later re-generation.</div>
+    <div class="al-chips"><span class="chip cg">config.yaml flag</span><span class="chip cg">Mistral 7B fallback</span><span class="chip cg">auto-resume</span></div>
+  </div>
+
+  <div class="sec">Output layer</div>
+  <div class="arch-layer al-gr">
+    <div class="al-label">Output pipeline</div>
+    <div class="al-body">Each scene written as Markdown. Chapter stitcher merges scenes with scene breaks. Pandoc converts to EPUB, DOCX, or PDF. Metadata sidecar: character index, unresolved plot threads, timeline, word count per chapter. Genre-specific front matter (world map stub for fantasy, cast list for thriller).</div>
+    <div class="al-chips"><span class="chip cgr">Markdown per scene</span><span class="chip cgr">Pandoc EPUB/DOCX</span><span class="chip cgr">metadata JSON</span><span class="chip cgr">word count tracking</span></div>
+  </div>
+</div>
+
+<!-- OPTIMAL LLMs -->
+<div id="models" class="panel">
+  <div class="sec">Structural model — same for both hardware tiers</div>
+  <div class="model-tier">
+    <div class="tier-hdr" style="background:var(--color-background-secondary)">Phi-3.5 Mini Instruct 3.8B · always via Ollama <span class="badge bg" style="margin-left:8px">recommended</span></div>
+    <div class="tier-body">
+      <div class="model-row">
+        <div class="mr-name">phi3.5:3.8b-mini-instruct-q5_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~2.3 GB · Metal GPU</span></div>
+        <div class="mr-detail">Microsoft's best small model. Exceptional at structured JSON output — critical for story bible and agent communication. Strong instruction following. Context window: 128K tokens. Runs entirely in GPU RAM leaving headroom for the prose model. Runs at ~25 tok/s on M1 — fast enough that structural phases feel instant.</div>
+      </div>
+      <div class="model-row">
+        <div class="mr-name">Alternative: Qwen2.5-3B-Instruct-Q5_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~2.0 GB · Metal GPU</span></div>
+        <div class="mr-detail">Smaller footprint, nearly identical JSON output quality. Good if you want to keep the structural model's RAM footprint minimal to leave more room for a larger prose model.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">Prose model — 8 GB M1 Air</div>
+  <div class="model-tier">
+    <div class="tier-hdr" style="background:var(--color-background-secondary)">8 GB Air — Hypura MoE streaming is the right choice</div>
+    <div class="tier-body">
+      <div class="model-row">
+        <div class="mr-name">Mixtral-8x7B-Instruct-v0.1-Q4_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~26 GB · Hypura MoE stream</span></div>
+        <div class="mr-detail"><span class="badge bp">best for 8 GB</span> MoE architecture = only 2 of 8 experts active per token. Hypura's 99.5% expert cache hit rate makes this surprisingly fast. Effectively ~47B parameter quality for prose, active at ~13B parameters per step. Confirmed working by Hypura documentation. Creative prose quality far exceeds any 7B or 8B model.</div>
+      </div>
+      <div class="model-row">
+        <div class="mr-name">Mistral-7B-Instruct-v0.3-Q5_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~5.1 GB · Ollama Metal GPU</span></div>
+        <div class="mr-detail"><span class="badge bgr">fallback only</span> Fits entirely in GPU RAM. Use as the fallback if Hypura has issues with a specific GGUF. Good prose for a 7B model but noticeably lower ceiling than Mixtral.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">Prose model — 16 GB M1 Air</div>
+  <div class="model-tier">
+    <div class="tier-hdr" style="background:var(--color-background-secondary)">16 GB Air — three strong options, ranked by quality</div>
+    <div class="tier-body">
+      <div class="model-row">
+        <div class="mr-name">Qwen2.5-72B-Instruct-Q4_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~40 GB · Hypura NVMe stream</span></div>
+        <div class="mr-detail"><span class="badge bg">best prose quality</span> Qwen2.5-72B is widely considered the best creative writing model at this size class — superior narrative voice, character consistency, and instruction following over Llama 70B. Dense model: Hypura uses FFN streaming via pread(). Slow (~0.3 tok/s) but since speed is not a concern, this produces the highest quality output available on consumer hardware.</div>
+      </div>
+      <div class="model-row">
+        <div class="mr-name">Llama-3.1-70B-Instruct-Q4_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~40 GB · Hypura NVMe stream</span></div>
+        <div class="mr-detail"><span class="badge bb">strong alternative</span> Very strong structural reasoning and plot coherence. Slightly better than Qwen2.5-72B at following complex multi-constraint prompts (like "write in the voice of character X, referencing event Y, while advancing thread Z"). Different strength profile than Qwen — try both and choose based on your genre.</div>
+      </div>
+      <div class="model-row">
+        <div class="mr-name">Mixtral-8x7B-Instruct-v0.1-Q5_K_M<br><span style="font-size:10px;font-family:var(--font-mono);color:var(--color-text-tertiary)">~32 GB · Hypura MoE stream</span></div>
+        <div class="mr-detail"><span class="badge ba">faster option</span> On 16 GB, Mixtral 8x7B runs at ~2.2 tok/s (confirmed). If you want a balance of quality and speed, this is it. Prose quality is excellent — just below the 70B tier. Use Q5_K_M for better quality than Q4_K_M with only ~6 GB more disk.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">Embedding model — for RAG memory</div>
+  <div class="card">
+    <div class="ct">nomic-embed-text v1.5 <span class="badge bg">recommended</span></div>
+    <div class="cb">Pulls via Ollama. 137M parameters, 768-dim embeddings, 8192 token context. Purpose-built for document retrieval. Runs in CPU/GPU, ~150 MB RAM. Significantly better recall than all-MiniLM-L6 for longer narrative passages. Pull with: <span style="font-family:var(--font-mono);font-size:11px">ollama pull nomic-embed-text</span></div>
+  </div>
+</div>
+
+<!-- TURBO QUANT PIPELINE -->
+<div id="quant" class="panel">
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">What TurboQuant (imatrix-calibrated GGUF) achieves</div>
+    <div class="cb">Standard quantization treats all weights equally — it reduces every weight's precision by the same amount. imatrix quantization first measures which weights matter most for YOUR specific use case (literary text), then protects those weights during quantization. Result: measurably lower perplexity loss vs naive Q4_K_M, especially for domain-specific creative tasks. This is the best quality-per-GB you can get offline.</div>
+  </div>
+
+  <div class="sec">Step-by-step quantization pipeline</div>
+  <div style="padding:2px 0">
+    <div class="quant-step">
+      <div class="qs-num">1</div>
+      <div class="qs-body">
+        <div class="qs-title">Install llama.cpp with Metal support</div>
+        <div class="qs-detail">Build from source to get the latest quantization tools. Homebrew formula may lag behind — source build ensures imatrix support is present.</div>
+        <span class="qs-cmd">brew install cmake && git clone https://github.com/ggerganov/llama.cpp && cd llama.cpp && cmake -B build -DLLAMA_METAL=ON && cmake --build build --config Release -j8</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">2</div>
+      <div class="qs-body">
+        <div class="qs-title">Download base models in full precision (BF16)</div>
+        <div class="qs-detail">Download from HuggingFace in safetensors format. You need the unquantized base model to quantize it yourself. Use huggingface-cli. Mixtral-8x7B-Instruct-v0.1 is ~90 GB in BF16 — needs external SSD temporarily. If disk is a concern, download a pre-quantized Q8_0 GGUF (~47 GB) instead and re-quantize from that.</div>
+        <span class="qs-cmd">pip install huggingface_hub && huggingface-cli download mistralai/Mixtral-8x7B-Instruct-v0.1 --local-dir ./models/mixtral-bf16</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">3</div>
+      <div class="qs-body">
+        <div class="qs-title">Convert to GGUF format (if starting from safetensors)</div>
+        <div class="qs-detail">llama.cpp's convert script produces a F16 GGUF ready for quantization. Skip if you downloaded a pre-made GGUF.</div>
+        <span class="qs-cmd">python llama.cpp/convert_hf_to_gguf.py ./models/mixtral-bf16 --outfile ./models/mixtral-f16.gguf --outtype f16</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">4</div>
+      <div class="qs-body">
+        <div class="qs-title">Build literary calibration dataset</div>
+        <div class="qs-detail">The imatrix is only as good as the calibration text. Download 50–100 public domain novels from Project Gutenberg across your target genres. Concat into a single calibration.txt (~10–20 MB). Include: literary fiction, thriller, fantasy, romance, sci-fi. Diverse literary text produces a better imatrix for novel writing than the default code/wiki datasets.</div>
+        <span class="qs-cmd">python scripts/build_calibration.py --gutenberg-ids 1342,11,84,2701,1661 --output calibration.txt</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">5</div>
+      <div class="qs-body">
+        <div class="qs-title">Generate importance matrix (imatrix)</div>
+        <div class="qs-detail">Run the model over the calibration dataset and record which weights activate most. Takes 30–90 minutes. The --chunks flag controls how much of the calibration data is processed — 256 chunks is thorough.</div>
+        <span class="qs-cmd">./build/bin/llama-imatrix -m ./models/mixtral-f16.gguf -f calibration.txt -o ./models/mixtral-imatrix.dat --chunks 256 -ngl 99</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">6</div>
+      <div class="qs-body">
+        <div class="qs-title">Quantize with imatrix (Q4_K_M for 8 GB · Q5_K_M for 16 GB)</div>
+        <div class="qs-detail">The --imatrix flag tells llama-quantize to use the importance data. Q4_K_M gives ~26 GB for Mixtral. Q5_K_M gives ~32 GB. For Phi-3.5 Mini use Q5_K_M (~2.3 GB) — the small size means you can afford the quality upgrade.</div>
+        <span class="qs-cmd">./build/bin/llama-quantize --imatrix ./models/mixtral-imatrix.dat ./models/mixtral-f16.gguf ./models/mixtral-8x7b-imatrix-Q4_K_M.gguf Q4_K_M</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">7</div>
+      <div class="qs-body">
+        <div class="qs-title">Validate with perplexity benchmark</div>
+        <div class="qs-detail">Run perplexity on a held-out literary text. Compare your imatrix Q4_K_M against a naive Q4_K_M — you should see 5–15% lower perplexity. If similar, the calibration dataset may need more genre diversity.</div>
+        <span class="qs-cmd">./build/bin/llama-perplexity -m ./models/mixtral-8x7b-imatrix-Q4_K_M.gguf -f validation_text.txt -ngl 99</span>
+      </div>
+    </div>
+    <div class="quant-step">
+      <div class="qs-num">8</div>
+      <div class="qs-body">
+        <div class="qs-title">Load into Hypura and profile</div>
+        <div class="qs-detail">Run hypura profile once after first install, then test your quantized model with --max-tokens 10 before a full run. Use hypura inspect to see how it plans to distribute tensors across GPU/RAM/NVMe.</div>
+        <span class="qs-cmd">hypura profile && hypura inspect ./models/mixtral-8x7b-imatrix-Q4_K_M.gguf && hypura serve ./models/mixtral-8x7b-imatrix-Q4_K_M.gguf --port 11435</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUILD ORDER -->
+<div id="build" class="panel">
+  <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.6">12 phases, ordered so each one is testable before the next begins. Click any phase to expand. Experienced developer: ~18 days. Learning as you go: 4–6 weeks.</div>
+
+  <div id="phases"></div>
+</div>
+
+<!-- DEPENDENCIES -->
+<div id="deps" class="panel">
+  <div class="sec">System tools (install first)</div>
+  <div class="dep-grid">
+    <div class="dep-card"><div class="dep-name">Homebrew</div><div class="dep-how">Package manager for macOS</div><div class="dep-cmd">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</div></div>
+    <div class="dep-card"><div class="dep-name">Python 3.11+</div><div class="dep-how">Via pyenv for version isolation</div><div class="dep-cmd">brew install pyenv && pyenv install 3.11.9</div></div>
+    <div class="dep-card"><div class="dep-name">Rust 1.75+</div><div class="dep-how">Required to build Hypura</div><div class="dep-cmd">curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh</div></div>
+    <div class="dep-card"><div class="dep-name">CMake</div><div class="dep-how">Required to build llama.cpp</div><div class="dep-cmd">brew install cmake</div></div>
+    <div class="dep-card"><div class="dep-name">Git (with LFS)</div><div class="dep-how">For large model file downloads</div><div class="dep-cmd">brew install git git-lfs</div></div>
+    <div class="dep-card"><div class="dep-name">Pandoc</div><div class="dep-how">EPUB/DOCX/PDF output</div><div class="dep-cmd">brew install pandoc</div></div>
+  </div>
+
+  <div class="sec">Inference servers</div>
+  <div class="dep-grid">
+    <div class="dep-card"><div class="dep-name">Ollama</div><div class="dep-how">Serves Phi-3.5 Mini + embeddings</div><div class="dep-cmd">brew install ollama && ollama pull phi3.5 && ollama pull nomic-embed-text</div></div>
+    <div class="dep-card"><div class="dep-name">Hypura</div><div class="dep-how">Serves large prose model via 3-tier scheduling</div><div class="dep-cmd">git clone --recurse-submodules https://github.com/t8/hypura && cd hypura && cargo build --release</div></div>
+    <div class="dep-card"><div class="dep-name">llama.cpp</div><div class="dep-how">imatrix quantization toolchain</div><div class="dep-cmd">git clone https://github.com/ggerganov/llama.cpp && cmake -B build -DLLAMA_METAL=ON && cmake --build build -j8</div></div>
+  </div>
+
+  <div class="sec">Python packages (requirements.txt)</div>
+  <div class="dep-grid">
+    <div class="dep-card"><div class="dep-name">pydantic[v2]</div><div class="dep-how">Story bible schema enforcement</div><div class="dep-cmd">pip install "pydantic[email]>=2.0"</div></div>
+    <div class="dep-card"><div class="dep-name">sqlalchemy 2.0</div><div class="dep-how">Story bible SQLite ORM</div><div class="dep-cmd">pip install sqlalchemy alembic</div></div>
+    <div class="dep-card"><div class="dep-name">chromadb</div><div class="dep-how">Local RAG vector store (no server)</div><div class="dep-cmd">pip install chromadb</div></div>
+    <div class="dep-card"><div class="dep-name">httpx</div><div class="dep-how">Async HTTP for Ollama + Hypura APIs</div><div class="dep-cmd">pip install httpx</div></div>
+    <div class="dep-card"><div class="dep-name">tiktoken</div><div class="dep-how">Token counting for context budget</div><div class="dep-cmd">pip install tiktoken</div></div>
+    <div class="dep-card"><div class="dep-name">rich</div><div class="dep-how">CLI progress display</div><div class="dep-cmd">pip install rich</div></div>
+    <div class="dep-card"><div class="dep-name">pyyaml</div><div class="dep-how">Genre pack + config loading</div><div class="dep-cmd">pip install pyyaml</div></div>
+    <div class="dep-card"><div class="dep-name">huggingface_hub</div><div class="dep-how">Model downloads from HF</div><div class="dep-cmd">pip install huggingface_hub</div></div>
+    <div class="dep-card"><div class="dep-name">spacy</div><div class="dep-how">NER for coherence checker</div><div class="dep-cmd">pip install spacy && python -m spacy download en_core_web_sm</div></div>
+    <div class="dep-card"><div class="dep-name">pytest</div><div class="dep-how">Integration testing</div><div class="dep-cmd">pip install pytest pytest-asyncio</div></div>
+  </div>
+
+  <div class="sec">Model files needed (download before building)</div>
+  <div class="dep-grid">
+    <div class="dep-card"><div class="dep-name">Mixtral-8x7B-Instruct-v0.1</div><div class="dep-how">BF16 base for quantization OR pre-made Q8_0</div><div class="dep-cmd">~90 GB BF16 or ~47 GB Q8_0 — needs external SSD</div></div>
+    <div class="dep-card"><div class="dep-name">Phi-3.5-mini-instruct</div><div class="dep-how">Via Ollama pull directly</div><div class="dep-cmd">ollama pull phi3.5:3.8b-mini-instruct-q5_K_M</div></div>
+    <div class="dep-card"><div class="dep-name">nomic-embed-text v1.5</div><div class="dep-how">Via Ollama pull directly</div><div class="dep-cmd">ollama pull nomic-embed-text</div></div>
+    <div class="dep-card"><div class="dep-name">Literary calibration corpus</div><div class="dep-how">~50 novels from Project Gutenberg</div><div class="dep-cmd">python scripts/build_calibration.py</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const phases = [
+  {num:'0',color:'#F1EFE8',tc:'#444441',bc:'#B4B2A9',title:'System prerequisites',meta:'Day 1 · ~3 hours',tasks:[
+    {c:'#888780',t:'<strong>Install system tools in order:</strong> Homebrew → pyenv + Python 3.11 → Rust 1.75 → CMake → Git LFS → Pandoc'},
+    {c:'#888780',t:'<strong>Install Ollama</strong> and verify: <code style="font-family:var(--font-mono);font-size:11px">ollama serve</code> runs and responds on port 11434'},
+    {c:'#888780',t:'<strong>Create project structure:</strong> /novel-engine/{orchestrator, agents, memory, output, models, genres, checkpoints}'},
+    {c:'#888780',t:'<strong>Python venv setup:</strong> pyenv virtualenv 3.11.9 novel-engine, activate, install base deps (pydantic, sqlalchemy, httpx, rich)'}
+  ]},
+  {num:'1',color:'#26215C',tc:'#CECBF6',bc:'#7F77DD',title:'Hypura build and validation',meta:'Day 1–2 · ~4 hours',tasks:[
+    {c:'#7F77DD',t:'<strong>Clone Hypura with submodules</strong> — the --recurse-submodules flag is required, plain clone will fail the build'},
+    {c:'#7F77DD',t:'<strong>cargo build --release</strong> — first build takes 5–15 minutes. Binary lands at target/release/hypura'},
+    {c:'#7F77DD',t:'<strong>Run hypura profile</strong> — profiles GPU/RAM/NVMe speeds, result cached. Run once per machine.'},
+    {c:'#7F77DD',t:'<strong>First model test:</strong> start with a small 7B GGUF you already have. Run <code style="font-family:var(--font-mono);font-size:11px">hypura run model.gguf --max-tokens 10</code> before touching Mixtral'},
+    {c:'#7F77DD',t:'<strong>Verify Ollama compatibility:</strong> run <code style="font-family:var(--font-mono);font-size:11px">hypura serve model.gguf --port 11435</code> and test with a curl to the /api/generate endpoint'}
+  ]},
+  {num:'2',color:'#412402',tc:'#FAC775',bc:'#BA7517',title:'TurboQuant pipeline',meta:'Day 2–3 · ~6 hours + GPU time',tasks:[
+    {c:'#BA7517',t:'<strong>Build llama.cpp with Metal:</strong> cmake -DLLAMA_METAL=ON. Verify llama-imatrix binary exists in build/bin/'},
+    {c:'#BA7517',t:'<strong>Build calibration corpus:</strong> download 50+ Project Gutenberg novels spanning all target genres. Concatenate into calibration.txt (~15 MB). Quality here directly affects prose quality output.'},
+    {c:'#BA7517',t:'<strong>Download Mixtral BF16 base</strong> via huggingface-cli. Requires ~90 GB temp space (external SSD recommended). Alternative: download a Q8_0 GGUF pre-made (~47 GB) and re-quantize from that.'},
+    {c:'#BA7517',t:'<strong>Run llama-imatrix</strong> against calibration.txt. Takes 30–90 minutes. Monitor output — should process all chunks without error.'},
+    {c:'#BA7517',t:'<strong>Run llama-quantize</strong> with --imatrix flag. Q4_K_M for 8 GB Air, Q5_K_M for 16 GB. Produces final .gguf model file.'},
+    {c:'#BA7517',t:'<strong>Run llama-perplexity</strong> on held-out test text. Confirm imatrix version beats naive quantization. If not, expand calibration corpus.'},
+    {c:'#BA7517',t:'<strong>Quantize Phi-3.5 Mini Q5_K_M</strong> using same pipeline. Small model, fast — do this same day.'}
+  ]},
+  {num:'3',color:'#26215C',tc:'#CECBF6',bc:'#7F77DD',title:'Model loading and stability test',meta:'Day 3 · ~4 hours',tasks:[
+    {c:'#7F77DD',t:'<strong>Pull Phi-3.5 Mini and nomic-embed-text</strong> via Ollama. Verify both respond correctly.'},
+    {c:'#7F77DD',t:'<strong>Start Hypura serve</strong> with your imatrix Mixtral GGUF on port 11435. Run hypura inspect first to see the tensor placement plan.'},
+    {c:'#7F77DD',t:'<strong>Stress test Hypura:</strong> send 50 consecutive requests with varying prompt lengths. Monitor for memory pressure, crashes, or response degradation. Any failures here must be resolved before building orchestrator.'},
+    {c:'#7F77DD',t:'<strong>Test JSON output from Phi-3:</strong> send 20 structured prompts asking for story bible JSON. Parse every response. Any invalid JSON means you need to add a repair step or adjust the system prompt.'},
+    {c:'#7F77DD',t:'<strong>Test creative prose from Mixtral:</strong> send 10 scene prompts across different genres. Evaluate quality, check for coherence. Set temperature and top-p values that produce good results for your target style.'}
+  ]},
+  {num:'4',color:'#042C53',tc:'#B5D4F4',bc:'#378ADD',title:'Story bible data layer',meta:'Day 4–5 · ~8 hours',tasks:[
+    {c:'#378ADD',t:'<strong>SQLAlchemy models:</strong> Character, PlotThread, WorldFact, Timeline, ChapterState, SceneState, GenreRule tables'},
+    {c:'#378ADD',t:'<strong>Pydantic v2 schemas</strong> for every model — these are the contract between agents. Every agent writes and reads via schemas, never raw SQL.'},
+    {c:'#378ADD',t:'<strong>CRUD service layer:</strong> StoryBible class with methods: get_character(name), update_plot_thread(id, status), add_world_fact(key, value), get_open_threads(), validate_timeline()'},
+    {c:'#378ADD',t:'<strong>Genre schema variants:</strong> each genre adds columns or JSON fields. Fantasy adds magic_rules, world_map_facts. Thriller adds crime_timeline, suspect_list. Implement as JSON column on GenreRule table.'},
+    {c:'#378ADD',t:'<strong>Alembic migrations setup</strong> — so schema changes mid-project don\'t destroy existing story data'},
+    {c:'#378ADD',t:'<strong>Unit tests:</strong> write/read all schema types, timeline validation edge cases, genre rule injection'}
+  ]},
+  {num:'5',color:'#04342C',tc:'#9FE1CB',bc:'#1D9E75',title:'RAG memory system',meta:'Day 5–6 · ~6 hours',tasks:[
+    {c:'#1D9E75',t:'<strong>ChromaDB local setup:</strong> PersistentClient pointing to /novel-engine/memory/chroma. No server, no Docker — pure local files.'},
+    {c:'#1D9E75',t:'<strong>Three collections:</strong> novel_summaries, chapter_summaries, scene_chunks. Different retrieval strategies per tier.'},
+    {c:'#1D9E75',t:'<strong>Embedding pipeline:</strong> after each scene is written, chunk it (512-token overlap), embed via nomic-embed-text (Ollama API), store in ChromaDB with metadata (chapter_idx, scene_idx, plot_threads_mentioned, characters_mentioned).'},
+    {c:'#1D9E75',t:'<strong>Retrieval pipeline:</strong> given current chapter/scene, fetch: tier 1 always (full novel summary), tier 2 by position (adjacent 3 chapters), tier 3 by semantic query built from scene beat. Enforce 1700-token total budget.'},
+    {c:'#1D9E75',t:'<strong>Compression utility:</strong> given N scene texts, produce a 200-token summary. Used by Memory Manager agent. Test this in isolation.'},
+    {c:'#1D9E75',t:'<strong>Integration test:</strong> write 5 mock scenes, embed them, then query and verify relevant context is retrieved for a continuation scene.'}
+  ]},
+  {num:'6',color:'#042C53',tc:'#B5D4F4',bc:'#378ADD',title:'Inference abstraction layer',meta:'Day 6–7 · ~5 hours',tasks:[
+    {c:'#378ADD',t:'<strong>InferenceClient base class:</strong> async generate(prompt, system_prompt, schema=None) → str. Two implementations: OllamaClient (port 11434) and HypuraClient (port 11435). Same interface.'},
+    {c:'#378ADD',t:'<strong>Schema enforcement wrapper:</strong> if schema is provided, append JSON schema to system prompt and parse/validate response. On parse failure, retry once with "respond only in valid JSON" prefix.'},
+    {c:'#378ADD',t:'<strong>Retry with backoff:</strong> 3 retries, exponential backoff. Log failures with full prompt for debugging.'},
+    {c:'#378ADD',t:'<strong>Fallback logic:</strong> if HypuraClient fails after 3 retries, switch to OllamaClient + Mistral 7B. Log chapter/scene so you can re-generate that section later with Hypura.'},
+    {c:'#378ADD',t:'<strong>Token counter:</strong> tiktoken-based counter, used to enforce RAG injection budget and estimate generation cost per chapter.'}
+  ]},
+  {num:'7',color:'#26215C',tc:'#CECBF6',bc:'#7F77DD',title:'Orchestrator FSM',meta:'Day 7–9 · ~10 hours',tasks:[
+    {c:'#7F77DD',t:'<strong>State enum:</strong> INIT, OUTLINE, CHAPTER_PLAN, SCENE_WRITE, SCENE_EDIT, MEMORY_UPDATE, CHECKPOINT, COMPLETE'},
+    {c:'#7F77DD',t:'<strong>Transition table:</strong> maps (current_state, result) → next_state. Handles success path and error path (rollback to previous state on agent failure).'},
+    {c:'#7F77DD',t:'<strong>Checkpoint writer:</strong> after CHECKPOINT state, write {chapter_idx, scene_idx, bible_db_path, chroma_path, last_prose_file} as atomic JSON write (write to .tmp then rename).'},
+    {c:'#7F77DD',t:'<strong>Checkpoint loader:</strong> on startup, check for checkpoint.json. If found, restore state and resume from that scene. User prompt confirms before resuming.'},
+    {c:'#7F77DD',t:'<strong>Progress tracker:</strong> chapters done, scenes done, word count, estimated completion time based on recent tok/s. Display with rich library.'},
+    {c:'#7F77DD',t:'<strong>Integration test:</strong> run a 2-chapter generation from seed to EPUB. Verify checkpoint file is written, verify resume works, verify output is coherent.'}
+  ]},
+  {num:'8',color:'#042C53',tc:'#B5D4F4',bc:'#378ADD',title:'Agent system',meta:'Day 9–12 · ~12 hours',tasks:[
+    {c:'#378ADD',t:'<strong>Agent base class:</strong> loads system_prompt from prompts/{role}.txt, binds to inference client, exposes run(context) → Pydantic model'},
+    {c:'#378ADD',t:'<strong>Architect agent:</strong> input = seed + genre pack. Output = StoryBibleInit schema: characters[], plot_threads[], world_facts[], chapter_count, act_boundaries[], theme.'},
+    {c:'#378ADD',t:'<strong>Planner agent:</strong> input = chapter slot + open plot threads + bible excerpt. Output = ChapterPlan schema: scene_beats[], threads_advancing[], threads_pausing[], threads_resolving[].'},
+    {c:'#378ADD',t:'<strong>Writer agent:</strong> input = scene beat + RAG context + character voice guide. Output = raw prose string (not JSON). Uses HypuraClient. This is the only agent that produces freeform text.'},
+    {c:'#378ADD',t:'<strong>Editor agent:</strong> input = prose + previous scene + bible excerpt. Output = EditResult schema: approved: bool, issues[]: {type, description, severity}. If approved=false and severity=critical, orchestrator sends back for rewrite.'},
+    {c:'#378ADD',t:'<strong>Memory Manager agent:</strong> input = completed chapter prose + current bible. Output = BibleUpdate schema: character_updates[], thread_updates[], new_world_facts[], chapter_summary string. Writes back to SQLite and ChromaDB.'},
+    {c:'#378ADD',t:'<strong>System prompt library:</strong> one .txt file per agent per genre. Fantasy thriller prompts differ from literary fiction prompts. Genre pack selection swaps the prompt file.'}
+  ]},
+  {num:'9',color:'#633806',tc:'#FAC775',bc:'#BA7517',title:'Genre system',meta:'Day 12–13 · ~6 hours',tasks:[
+    {c:'#BA7517',t:'<strong>Genre pack YAML format:</strong> {name, story_bible_schema_extras, system_prompt_prefixes: {architect, planner, writer, editor}, world_facts_template, special_rules[]}'},
+    {c:'#BA7517',t:'<strong>Fantasy pack:</strong> magic_system_rules, fictional_place_names, creature_types, language_notes, map_facts. Writer prompt prefix emphasizes world-building language and sensory detail.'},
+    {c:'#BA7517',t:'<strong>Thriller pack:</strong> crime_timeline, suspect_list, clue_ledger, red_herrings[], alibi_matrix. Writer prompt prefix emphasizes tension, pacing, short chapters. Editor checks for clue consistency.'},
+    {c:'#BA7517',t:'<strong>Romance pack:</strong> emotional_arc_beats, relationship_stages, tension_resolution_markers. Writer prompt emphasizes internal monologue and emotional stakes.'},
+    {c:'#BA7517',t:'<strong>Sci-fi pack:</strong> tech_rules, setting_facts, scientific_constraints, terminology_glossary. Prevents internal contradictions in tech.'},
+    {c:'#BA7517',t:'<strong>Literary/general pack:</strong> thematic_threads, symbolic_motifs, narrative_voice notes. Most flexible — writer prompt focuses on prose style over genre mechanics.'}
+  ]},
+  {num:'10',color:'#27500A',tc:'#C0DD97',bc:'#639922',title:'Output pipeline',meta:'Day 13–14 · ~4 hours',tasks:[
+    {c:'#639922',t:'<strong>Scene writer:</strong> saves each scene as /output/{novel_slug}/chapters/{ch:03d}/scenes/{sc:03d}.md. Includes front matter: chapter, scene, word_count, characters_present, plot_threads_advanced.'},
+    {c:'#639922',t:'<strong>Chapter stitcher:</strong> merges scene .md files into chapter .md. Adds scene break dividers (***). Produces /output/{novel_slug}/chapters/{ch:03d}.md.'},
+    {c:'#639922',t:'<strong>Novel assembler:</strong> stitches all chapter files into full manuscript.md. Adds title page, chapter headings. Calculates total word count.'},
+    {c:'#639922',t:'<strong>Pandoc converter:</strong> manuscript.md → novel.epub (primary), novel.docx, novel.pdf. Custom pandoc CSS for clean epub formatting.'},
+    {c:'#639922',t:'<strong>Metadata export:</strong> generates novel_metadata.json: {title, word_count, chapters, characters[], unresolved_threads[], timeline_summary, genre}. Useful for proofreading and continuation.'}
+  ]},
+  {num:'11',color:'#444441',tc:'#D3D1C7',bc:'#888780',title:'Integration testing and stability',meta:'Day 14–16 · ~8 hours',tasks:[
+    {c:'#888780',t:'<strong>End-to-end test:</strong> one seed → full 3-chapter story → EPUB. Verify prose is coherent, bible is consistent, RAG context was relevant in each scene.'},
+    {c:'#888780',t:'<strong>Stability test:</strong> 4-hour continuous run. Monitor RAM, swap usage, NVMe read rate. Confirm Hypura does not accumulate memory over time. Check checkpoint files are written correctly.'},
+    {c:'#888780',t:'<strong>Resume test:</strong> kill the process mid-chapter. Restart. Verify it resumes at the correct scene without duplicate prose or bible corruption.'},
+    {c:'#888780',t:'<strong>Genre switching test:</strong> run the same seed with thriller, fantasy, and literary packs. Verify genre-specific schema fields populate correctly and prose style shifts.'},
+    {c:'#888780',t:'<strong>Fallback test:</strong> artificially kill Hypura mid-run. Verify fallback to Ollama+Mistral7B triggers, generation continues, and a log entry is written for the affected scene.'}
+  ]},
+  {num:'12',color:'#444441',tc:'#D3D1C7',bc:'#888780',title:'CLI and documentation',meta:'Day 16–18 · ~6 hours',tasks:[
+    {c:'#888780',t:'<strong>CLI entry point:</strong> python novel.py --seed "..." --genre thriller --chapters 30 --output ./my-novel. Parse with argparse or typer.'},
+    {c:'#888780',t:'<strong>config.yaml:</strong> model paths, port numbers, output directory, quantization level, fallback model path, max scene retries, token budget overrides.'},
+    {c:'#888780',t:'<strong>First-run setup script:</strong> checks all dependencies are installed, both servers respond, models are present, calibration corpus exists. Prints clear errors if anything is missing.'},
+    {c:'#888780',t:'<strong>README with quickstart:</strong> from zero to first chapter in 30 minutes (assumes models are already downloaded and quantized). Include example seeds for each genre.'}
+  ]}
+];
+
+function buildPhases() {
+  const container = document.getElementById('phases');
+  phases.forEach((p, i) => {
+    const ph = document.createElement('div');
+    ph.className = 'phase';
+    ph.innerHTML = `
+      <div class="phase-hdr" onclick="togglePhase(${i})">
+        <div class="phase-num" style="background:${p.color};color:${p.tc};border:0.5px solid ${p.bc}">${p.num}</div>
+        <div class="phase-title">${p.title}</div>
+        <div class="phase-meta">${p.meta}</div>
+      </div>
+      <div class="phase-body" id="pb${i}">
+        ${p.tasks.map(t => `<div class="task"><div class="task-dot" style="background:${t.c}"></div><div class="task-text">${t.t}</div></div>`).join('')}
+      </div>`;
+    container.appendChild(ph);
+  });
+}
+
+function togglePhase(i) {
+  const b = document.getElementById('pb'+i);
+  b.classList.toggle('open');
+}
+
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+buildPhases();
+</script>

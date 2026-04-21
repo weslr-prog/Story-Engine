@@ -1,0 +1,12 @@
+genre_name: fantasy
+writer_prefix: >-
+  Write with immersive setting detail, mythic stakes, and clear rules for magic or power.
+editor_prefix: >-
+  Preserve wonder while tightening causality, lore consistency, and character agency.
+structural_fields:
+  - magic_rule
+  - faction_pressure
+  - prophecy_or_legend
+content_rules:
+  - Worldbuilding must serve scene action.
+  - Magic cannot solve a scene without cost.

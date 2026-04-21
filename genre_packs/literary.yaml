@@ -1,0 +1,12 @@
+genre_name: literary
+writer_prefix: >-
+  Write with psychological precision, thematic layering, and controlled, intentional prose rhythm.
+editor_prefix: >-
+  Tighten thematic coherence, subtext, and image systems while preserving voice.
+structural_fields:
+  - thematic_thread
+  - emotional_displacement
+  - symbolic_image
+content_rules:
+  - Prioritize emotional specificity over plot shorthand.
+  - Repeated imagery must evolve in meaning.

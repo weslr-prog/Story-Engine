@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Mara Quill",
+    "role": "protagonist",
+    "core_wound": "She failed to protect her sister during a prior data purge.",
+    "flawed_belief": "Control is safer than trust.",
+    "voice_style": "precise, emotionally guarded"
+  },
+  {
+    "name": "Ivo Vale",
+    "role": "ally",
+    "core_wound": "Expelled for exposing corruption.",
+    "flawed_belief": "Truth alone saves people.",
+    "voice_style": "dry wit, blunt honesty"
+  }
+]

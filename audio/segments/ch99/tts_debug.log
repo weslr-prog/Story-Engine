@@ -1,0 +1,47 @@
+[2026-04-20 22:47:28] [INFO] Resolved Chatterbox backend root_url=http://127.0.0.1:7866 api_prefix=/gradio_api api_name=/generate endpoints=/generate,/load_model
+[2026-04-20 22:47:28] [DEBUG] SSE open http://127.0.0.1:7866/gradio_api/call/load_model/e5a3c568474045df87fce5dff97a03b6
+[2026-04-20 22:47:43] [DEBUG] SSE /load_model event: heartbeat
+[2026-04-20 22:47:43] [DEBUG] SSE /load_model data: null
+[2026-04-20 22:47:50] [DEBUG] SSE /load_model event: complete
+[2026-04-20 22:47:50] [DEBUG] SSE /load_model data: [null]
+[2026-04-20 22:47:50] [INFO] Model load completed event_id=e5a3c568474045df87fce5dff97a03b6
+[2026-04-20 22:47:50] [INFO] Uploaded voice sample local_voice=/Users/wes/Desktop/Story-Engine/voices/p233_023.wav remote_voice=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav
+[2026-04-20 22:47:50] [INFO] TTS chapter 99 start sentences=1 voice=/Users/wes/Desktop/Story-Engine/voices/p233_023.wav api=/generate resume=False
+[2026-04-20 22:47:50] [DEBUG] TTS sentence attempt chapter=99 sentence_index=1 sentence_total=1 attempt=1 attempt_total=2 chars=64 preview=This is a short validation sentence for the local Chatterbox UI.
+[2026-04-20 22:47:50] [DEBUG] SSE open http://127.0.0.1:7866/gradio_api/call/generate/c8afda01f5e549beaff64916154a2299
+[2026-04-20 22:48:06] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:48:06] [DEBUG] SSE /generate data: null
+[2026-04-20 22:48:21] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:48:21] [DEBUG] SSE /generate data: null
+[2026-04-20 22:48:36] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:48:36] [DEBUG] SSE /generate data: null
+[2026-04-20 22:48:50] [WARN] Sentence generation failed chapter=99 sentence_index=1 attempt=1 sleep_seconds=0.750 error=("Connection broken: TimeoutError('chapter 99 sentence 0 exceeded 60s')", TimeoutError('chapter 99 sentence 0 exceeded 60s'))
+[2026-04-20 22:48:51] [DEBUG] TTS sentence attempt chapter=99 sentence_index=1 sentence_total=1 attempt=2 attempt_total=2 chars=64 preview=This is a short validation sentence for the local Chatterbox UI.
+[2026-04-20 22:48:51] [DEBUG] SSE open http://127.0.0.1:7866/gradio_api/call/generate/101d986dff5a48a1b004eb87b7fdbf1e
+[2026-04-20 22:49:06] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:49:06] [DEBUG] SSE /generate data: null
+[2026-04-20 22:49:21] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:49:21] [DEBUG] SSE /generate data: null
+[2026-04-20 22:49:36] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:49:36] [DEBUG] SSE /generate data: null
+[2026-04-20 22:49:51] [WARN] Sentence generation failed chapter=99 sentence_index=1 attempt=2 sleep_seconds=1.500 error=("Connection broken: TimeoutError('chapter 99 sentence 0 exceeded 60s')", TimeoutError('chapter 99 sentence 0 exceeded 60s'))
+[2026-04-20 22:49:53] [WARN] Sentence failed after retries chapter=99 sentence_index=1 error=("Connection broken: TimeoutError('chapter 99 sentence 0 exceeded 60s')", TimeoutError('chapter 99 sentence 0 exceeded 60s'))
+[2026-04-20 22:50:49] [INFO] Resolved Chatterbox backend root_url=http://127.0.0.1:7866 api_prefix=/gradio_api api_name=/generate endpoints=/generate,/load_model
+[2026-04-20 22:50:49] [DEBUG] SSE open http://127.0.0.1:7866/gradio_api/call/load_model/103ecfa4f0234b32af94bfeac08c552a
+[2026-04-20 22:51:01] [DEBUG] SSE /load_model event: complete
+[2026-04-20 22:51:01] [DEBUG] SSE /load_model data: [null]
+[2026-04-20 22:51:01] [INFO] Model load completed event_id=103ecfa4f0234b32af94bfeac08c552a
+[2026-04-20 22:51:01] [INFO] Uploaded voice sample local_voice=/Users/wes/Desktop/Story-Engine/voices/p233_023.wav remote_voice=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/8fcd695273265f4cfa46898fccee04f8bd50d7601646f76a73aab15427ca252d/p233_023.wav
+[2026-04-20 22:51:01] [INFO] TTS chapter 99 start sentences=1 voice=/Users/wes/Desktop/Story-Engine/voices/p233_023.wav api=/generate resume=False
+[2026-04-20 22:51:01] [DEBUG] TTS sentence attempt chapter=99 sentence_index=1 sentence_total=1 attempt=1 attempt_total=2 chars=64 preview=This is a short validation sentence for the local Chatterbox UI.
+[2026-04-20 22:51:01] [DEBUG] SSE open http://127.0.0.1:7866/gradio_api/call/generate/f3ab4bc564c04489aab110623a86525c
+[2026-04-20 22:51:16] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:51:16] [DEBUG] SSE /generate data: null
+[2026-04-20 22:51:31] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:51:31] [DEBUG] SSE /generate data: null
+[2026-04-20 22:51:46] [DEBUG] SSE /generate event: heartbeat
+[2026-04-20 22:51:46] [DEBUG] SSE /generate data: null
+[2026-04-20 22:51:48] [DEBUG] SSE /generate event: complete
+[2026-04-20 22:51:48] [DEBUG] SSE /generate data: [{"path": "/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/eb51851053b55bb317ccd90ae011eb9dd48602b2c06260fb28042c7feca86c76/audio.wav", "url": "http://127.0.0.1:7866/gradio_api/file=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/eb51851053b55bb317ccd90ae011eb9dd48602b2c06260fb28042c7feca86c76/audio.wav", "size": null, "orig_name": "audio.wav", "mime_type": null, "is_stream": false, "meta": {"_type": "gradio.FileData"}}]
+[2026-04-20 22:51:48] [INFO] Sentence generated chapter=99 sentence_index=1 output_segment=/Users/wes/Desktop/Story-Engine/audio/segments/ch99/seg_0000.wav source_audio=/private/var/folders/px/8hnzhknn30j9v8jvtwdz464r0000gn/T/gradio/eb51851053b55bb317ccd90ae011eb9dd48602b2c06260fb28042c7feca86c76/audio.wav pad_seconds=0.250
+[2026-04-20 22:51:48] [INFO] TTS chapter 99 done segments=1 output=/Users/wes/Desktop/Story-Engine/audio/ch99_validation.wav elapsed=59.396

@@ -1,0 +1,13 @@
+genre_name: thriller_scifi
+writer_prefix: >-
+  Write with escalating pressure, grounded speculative detail, and scene-level clarity on objective, obstacle, and consequence.
+editor_prefix: >-
+  Preserve tension while tightening continuity, location logic, stakes clarity, and character intent.
+structural_fields:
+  - threat_vector
+  - reveal_pacing
+  - tech_constraint
+content_rules:
+  - Keep suspense rising through each scene.
+  - Every scene must state a concrete objective and consequence.
+  - Do not move characters between locations without visible transition.
