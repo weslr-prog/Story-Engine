@@ -166,7 +166,21 @@ def _parse_characters_from_bible(text: str) -> list[dict[str, Any]]:
         )
 
     if characters:
-        return characters
+        # Guard against malformed captures where section labels (for example
+        # "Minimum Cast") are mistaken for character names.
+        cleaned = []
+        for entry in characters:
+            raw_name = _clean(str(entry.get("name", "")))
+            lowered = raw_name.lower()
+            if not raw_name:
+                continue
+            if "minimum cast" in lowered:
+                continue
+            if raw_name.startswith("#"):
+                continue
+            cleaned.append(entry)
+        if cleaned:
+            return cleaned
 
     # Fallback parser for markdown-first Story Bible formats where each
     # character section uses labeled fields like "**Name:**".
@@ -201,7 +215,43 @@ def _parse_characters_from_bible(text: str) -> list[dict[str, Any]]:
             }
         )
 
-    return fallback
+    if fallback:
+        return fallback
+
+    # Final fallback for markdown blocks that repeat labeled fields using
+    # "**Name:** ..." without clean heading separators.
+    field_blocks = re.split(r"(?im)^\s*\*\*Name\s*:\*\*", roster_block)
+    parsed: list[dict[str, Any]] = []
+    for block in field_blocks[1:]:
+        segment = block.strip()
+        if not segment:
+            continue
+        first_line, _, remainder = segment.partition("\n")
+        name = _strip_markdown_wrappers(first_line)
+        combined = f"**Name:** {first_line}\n{remainder}"
+        role = _extract_after_label(combined, "Role")
+        age_raw = _extract_after_label(combined, "Age")
+        profile = _extract_after_label(combined, "3-sentence profile") or _extract_after_label(combined, "Profile")
+        voice = _extract_after_label(combined, "Voice note")
+
+        if not name:
+            continue
+
+        age_or_range: Any = age_raw or "unknown"
+        if re.fullmatch(r"\d+", str(age_or_range)):
+            age_or_range = int(str(age_or_range))
+
+        parsed.append(
+            {
+                "name": _clean(name),
+                "role": _clean(role) or "Supporting",
+                "age_or_range": age_or_range,
+                "short_description": _clean(profile) if profile else "",
+                "voice_style": _clean(voice) if voice else "",
+            }
+        )
+
+    return parsed
 
 
 def _parse_writing_rules(text: str) -> list[str]:

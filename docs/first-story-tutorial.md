@@ -132,7 +132,7 @@ You can tune:
 
 If prose is too long, too vague, or too repetitive, tighten these first.
 
-### 5.3 Dashboard for Sections 5.2 to 9
+### 5.3 Dashboard for Monitoring and Controls
 
 Launch the Story Studio tabbed dashboard:
 
@@ -140,26 +140,27 @@ Launch the Story Studio tabbed dashboard:
 python ui/gradio_dashboard.py
 ```
 
-Open:
+Open your browser to:
 - http://127.0.0.1:7800
 
-What it shows:
-- active runner state (running or idle)
-- current chapter and phase
-- chapter progress and ETA text
-- current artifact status
-- review packet path
-- run log tail
+**Note:** If you get a port error, the default fallback port is 7801. Check the terminal output.
 
-Tabs include:
-- Projects
-- Inputs
-- Convert
-- Voice
-- Downloads
-- Run Dashboard
+What the dashboard shows:
+- Active project and pipeline state (running or idle)
+- Current chapter and phase during generation
+- Chapter progress and ETA
+- Current artifact status and review packet path
+- Real-time run log tail
 
-Use this to monitor the active/current work during generation, review, and narration gates.
+Dashboard tabs include:
+- **Projects:** Create and manage projects
+- **Inputs:** Upload and manage input documents
+- **Convert:** Run phase-output conversion
+- **Voice:** Upload narrator voice sample
+- **Downloads:** Export generated files
+- **Run Dashboard:** Start/stop pipeline, set parameters, reset chapters, approve narration, monitor progress
+
+You can run the pipeline from the Dashboard UI *or* from the CLI (`python main.py run ...`). Both use the same backend.
 
 ### 5.4 Validate Phase 1-4 Prompt Outputs (Recommended)
 
@@ -189,6 +190,27 @@ VOICE_SAMPLE=voices/p233_023.wav
 ```
 
 If VOICE_SAMPLE is empty, pipeline falls back to voices/p233_023.wav.
+
+## 6.1 Paralinguistic Prompts (Optional Feature)
+
+You can add emotional and pacing markup to your chapter text using paralinguistic tags. These are passed to the TTS system but NOT spoken aloud.
+
+**Syntax:**
+- `[emotion: sad]` — specify emotional tone
+- `[pace: slow]` or `[pace: fast]` — narration speed hint
+- `[whisper]` — delivery style
+- `[angry]`, `[confused]`, `[hopeful]` — any emotion or style
+
+**Example:**
+```
+"I'm sorry," she said. [emotion: sad] [pace: slow] "I didn't mean to."
+```
+
+Result: TTS narrates only "I'm sorry," she said. "I didn't mean to." but applies sadness and slow pace.
+
+**Configuration:**
+- Enable/disable: `PARALINGUSTIC_ENABLED=true` in .env (default: true)
+- Strip from audio: `PARALINGUSTIC_STRIP_FROM_NARRATION=true` (default: true) — if false, tags are included in spoken text
 
 ## 7. Run the First 3 Chapters
 
@@ -355,6 +377,53 @@ Fix order:
 1. tighten chapter_briefs.json chapter goal and key events
 2. tighten genre_packs/thriller_scifi.yaml writer_prefix and content_rules
 3. rerun only that chapter after reset_chapter.py
+
+## 11. Reset a Chapter or Entire Project
+
+You can reset chapter outputs at any time to regenerate with new prompts or parameters.
+
+### Reset One Chapter (CLI)
+
+To delete outputs for chapter 2 and rerun generation:
+
+```bash
+python scripts/reset_chapter.py --chapter 2
+```
+
+This removes:
+- ch02_draft.txt, ch02_edited.txt, ch02_final.txt, ch02_tts.txt
+- ch02_narration.wav and all sentence segments
+- ch02_summary.txt and all review files
+
+**Preview what will be deleted (dry-run):**
+```bash
+python scripts/reset_chapter.py --chapter 2 --dry-run
+```
+
+### Reset Current Chapter (Dashboard UI)
+
+In the Dashboard "Run Dashboard" tab:
+1. Click "Reset Run"
+2. Select scope: "Current Chapter"
+3. Enter chapter number (e.g., 2)
+4. Optional: enable "Force Stop" if pipeline is running
+5. Click "Reset"
+
+### Reset All Chapters (Full Project Reset)
+
+In the Dashboard "Run Dashboard" tab:
+1. Click "Reset Run"
+2. Select scope: "All Chapters"
+3. Optional: enable "Force Stop" and "Root Pipeline Files" (to also clear story_bible.json, characters.json, etc.)
+4. Confirm "All Chapters reset" checkbox
+5. Click "Reset"
+
+Or from CLI:
+```bash
+for ch in {1..10}; do python scripts/reset_chapter.py --chapter $ch; done
+```
+
+After reset, you can immediately start a new run from the beginning.
 
 ## 12. Recommended First-Run Workflow Summary
 

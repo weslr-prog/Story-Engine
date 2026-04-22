@@ -53,7 +53,8 @@ def validate_phase3_labels(path: Path, errors: list[str], notes: list[str]) -> N
     text = read_text(path)
     missing: list[str] = []
     for label in REQUIRED_PHASE3_LABELS:
-        pattern = re.compile(rf"(^|\n)\s*{re.escape(label)}\s*:?", re.IGNORECASE)
+        # Allow markdown formatting: ** or # before/around label, optional colon after
+        pattern = re.compile(rf"(\*\*)?{re.escape(label)}(\*\*)?(\s*:)?", re.IGNORECASE)
         if not pattern.search(text):
             missing.append(label)
     if missing:

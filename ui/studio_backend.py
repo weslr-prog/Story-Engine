@@ -1274,6 +1274,7 @@ def start_pipeline_run(
     env = os.environ.copy()
     env["LLM_BACKEND"] = "local_disk_kv"
     env["USE_LOCAL_DISK_KV"] = "true"
+    env["PROJECT_NAME"] = project_name
     endpoint, model_name = _model_profile_runtime(model_profile)
     env["LOCAL_DISK_KV_URL"] = endpoint
     env["LOCAL_DISK_KV_MODEL"] = model_name
@@ -1415,19 +1416,26 @@ def reset_pipeline_run(
         return "Please confirm All Chapters reset before proceeding."
 
     removed = 0
+    checkpoint_file = ROOT / SETTINGS.checkpoint_dir / f"{project_name}.json"
     if scope == "Current Chapter":
         target = max(1, int(chapter_num))
         removed += _reset_chapter_outputs(target)
+        if _safe_unlink(checkpoint_file):
+            removed += 1
         _reset_runner_state()
     elif scope == "All Chapters":
         for num in range(1, _max_known_chapters() + 1):
             removed += _reset_chapter_outputs(num)
         removed += _safe_rmtree(ROOT / "audio" / "segments")
+        if _safe_unlink(checkpoint_file):
+            removed += 1
         for path in RUNNER_STATE_DIR.glob("pipeline_run_*.log"):
             if _safe_unlink(path):
                 removed += 1
         _reset_runner_state()
     else:
+        if _safe_unlink(checkpoint_file):
+            removed += 1
         _reset_runner_state()
 
     if project_name:

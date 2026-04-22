@@ -101,6 +101,8 @@ class Settings:
     pause_multiplier_mid: float
     pause_paragraph_bonus: float
     intro_lead_in_seconds: float
+    paralingustic_enabled: bool
+    paralingustic_strip_from_narration: bool
 
 
 def load_settings() -> Settings:
@@ -166,6 +168,8 @@ def load_settings() -> Settings:
         pause_multiplier_mid=_env_float("PAUSE_MULTIPLIER_MID", 0.7),
         pause_paragraph_bonus=_env_float("PAUSE_PARAGRAPH_BONUS", 0.15),
         intro_lead_in_seconds=_env_float("INTRO_LEAD_IN_SECONDS", 0.0),
+        paralingustic_enabled=_env_bool("PARALINGUSTIC_ENABLED", True),
+        paralingustic_strip_from_narration=_env_bool("PARALINGUSTIC_STRIP_FROM_NARRATION", True),
     )
 
 

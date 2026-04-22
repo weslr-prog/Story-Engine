@@ -3,9 +3,17 @@ from __future__ import annotations
 
 import os
 import socket
+import sys
 import time
+from pathlib import Path
+
+# Add repo root to path for imports
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import gradio as gr
+import gradio_client.utils as gradio_client_utils
 
 from ui.studio_backend import (
     MODEL_PROFILE_CHOICES,
@@ -43,6 +51,41 @@ from ui.studio_backend import (
     sync_selected_voice_to_root,
     sync_project_json_to_root,
 )
+
+
+def _patch_gradio_bool_schema_bug() -> None:
+    original_get_type = getattr(gradio_client_utils, "get_type", None)
+    original_json_schema_to_python_type = getattr(gradio_client_utils, "json_schema_to_python_type", None)
+    original_nested_parser = getattr(gradio_client_utils, "_json_schema_to_python_type", None)
+    if original_get_type is None:
+        return
+    if getattr(original_get_type, "_story_engine_bool_schema_patch", False):
+        return
+
+    def patched_get_type(schema):
+        if isinstance(schema, bool):
+            return "Any" if schema else "None"
+        return original_get_type(schema)
+
+    def patched_nested_parser(schema, defs):
+        if isinstance(schema, bool):
+            return "Any" if schema else "None"
+        return original_nested_parser(schema, defs)
+
+    def patched_json_schema_to_python_type(schema):
+        if isinstance(schema, bool):
+            return "Any" if schema else "None"
+        return original_json_schema_to_python_type(schema)
+
+    patched_get_type._story_engine_bool_schema_patch = True
+    gradio_client_utils.get_type = patched_get_type
+    if original_nested_parser is not None:
+        gradio_client_utils._json_schema_to_python_type = patched_nested_parser
+    if original_json_schema_to_python_type is not None:
+        gradio_client_utils.json_schema_to_python_type = patched_json_schema_to_python_type
+
+
+_patch_gradio_bool_schema_bug()
 
 GENRE_WORD_PRESETS = {
     "Auto (Current Settings)": (1800, 2400),
@@ -698,6 +741,5 @@ if __name__ == "__main__":
     app.launch(
         server_name=host,
         server_port=port,
-        css=TIP_CSS,
-        js=TIP_JS,
+        show_api=False,
     )

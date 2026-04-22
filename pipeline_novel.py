@@ -210,6 +210,40 @@ def _write(path: Path, text: str) -> None:
     path.write_text((text or "").strip() + "\n", encoding="utf-8")
 
 
+def _word_count(text: str) -> int:
+    return len((text or "").split())
+
+
+def _chapter_heading(chapter_num: int, brief: dict[str, Any]) -> str:
+    raw_title = str(brief.get("title") or "").strip()
+    if raw_title:
+        lowered = raw_title.lower()
+        if lowered.startswith("chapter"):
+            return raw_title
+        return f"Chapter {chapter_num}: {raw_title}"
+    return f"Chapter {chapter_num}"
+
+
+def _with_chapter_heading(chapter_num: int, brief: dict[str, Any], text: str) -> str:
+    body = (text or "").strip()
+    if not body:
+        return body
+    heading = _chapter_heading(chapter_num, brief)
+    if body.lower().startswith(heading.lower()):
+        return body
+    return f"{heading}\n\n{body}"
+
+
+def _target_min_words(brief: dict[str, Any]) -> int:
+    env_target = int(os.getenv("WORD_TARGET_MIN", "0") or "0")
+    if env_target > 0:
+        return env_target
+    brief_target = int(brief.get("word_target", 0) or 0)
+    if brief_target > 0:
+        return max(800, int(brief_target * 0.8))
+    return 1800
+
+
 def _is_truthy(name: str, default: bool = False) -> bool:
     raw = os.getenv(name)
     if raw is None:
@@ -322,9 +356,14 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
     )
     genre = load_genre_pack(SETTINGS.default_genre_pack)
 
+    prose_client = router.prose
+    if not router_health.get("prose_ok") and router.fallback is not None:
+        print("[ROUTER] Prose lane unavailable at startup; using fallback structural model for prose generation.")
+        prose_client = router.fallback
+
     planner = PlannerAgent(client=router.structural)
-    writer = WriterAgent(client=router.prose)
-    editor = EditorAgent(client=router.prose)
+    writer = WriterAgent(client=prose_client)
+    editor = EditorAgent(client=prose_client)
     memory_manager = MemoryManagerAgent(client=router.structural)
     architect = ArchitectAgent(client=router.structural)
 
@@ -476,9 +515,11 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
                     draft = writer.run(
                         context,
                         {
-                            "instruction": "Write a polished chapter scene in present tense unless brief implies otherwise.",
+                            "instruction": "Write a polished chapter in past tense unless the brief explicitly requires another tense.",
                             "style": genre.writer_prefix,
                             "brief": brief,
+                            "characters": characters,
+                            "previous_summary": plan_vars.get("previous_summary", ""),
                             "scene_plan": context.metadata.get("scene_plan", ""),
                         },
                     ).content
@@ -514,11 +555,45 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
                         fallback_count += 1
                 _write(artifacts.edited, edited)
 
-                lint_report = lint_chapter(edited, chapter_num, brief, LintSettings())
+                final_text = edited
+
+                if not dry_run:
+                    min_words = _target_min_words(brief)
+                    expansion_passes = max(0, int(os.getenv("EXPANSION_PASSES", "1") or "1"))
+                    pass_idx = 0
+                    while _word_count(final_text) < min_words and pass_idx < expansion_passes:
+                        pass_idx += 1
+                        expanded = writer.run(
+                            context,
+                            {
+                                "instruction": (
+                                    f"Expand this chapter to at least {min_words} words while preserving canon, tone, "
+                                    "plot facts, and chapter continuity. Return only chapter prose."
+                                ),
+                                "style": genre.writer_prefix,
+                                "brief": brief,
+                                "characters": characters,
+                                "previous_summary": plan_vars.get("previous_summary", ""),
+                                "scene_plan": context.metadata.get("scene_plan", ""),
+                                "draft": final_text,
+                            },
+                        ).content
+                        final_text = editor.run(
+                            context,
+                            {
+                                "instruction": "Polish this expanded chapter while preserving plot and continuity.",
+                                "editor_prefix": genre.editor_prefix,
+                                "draft": expanded,
+                            },
+                        ).content
+                        diag = context.inference_log.get("agents", {}).get("editor", {}).get("diagnostics", {})
+                        if diag.get("fallback_used"):
+                            fallback_count += 1
+
+                final_text = _with_chapter_heading(chapter_num, brief, final_text)
+                lint_report = lint_chapter(final_text, chapter_num, brief, LintSettings())
                 _save_json(artifacts.lint_json, lint_report)
                 _write(artifacts.lint_md, to_markdown(lint_report))
-
-                final_text = edited
                 _write(artifacts.final, final_text)
                 _write(artifacts.tts, final_text)
 

@@ -79,6 +79,32 @@ def split_sentences(text: str) -> list[str]:
     return [sentence for sentence, _ in _split_sentences_with_paragraph_breaks(text)]
 
 
+def _extract_paralinguistic_tags(sentence: str) -> tuple[str, dict[str, str]]:
+    """
+    Extract paralinguistic tags from a sentence.
+    
+    Matches patterns like [emotion: sad], [pace: slow], or [whisper]
+    Returns: (cleaned_sentence, tags_dict)
+    """
+    if not SETTINGS.paralingustic_enabled:
+        return sentence, {}
+    
+    tags: dict[str, str] = {}
+    # Pattern: [word] or [word: value] where word can contain lowercase/uppercase/numbers
+    tag_pattern = re.compile(r'\[([a-zA-Z_][a-zA-Z0-9_]*)(?:\s*:\s*([^\]]+))?\]')
+    
+    def extract_tag(match):
+        tag_name = match.group(1).lower()
+        tag_value = match.group(2).strip() if match.group(2) else "true"
+        tags[tag_name] = tag_value
+        return ""
+    
+    # Remove tags from sentence
+    cleaned = tag_pattern.sub(extract_tag, sentence).strip()
+    
+    return cleaned, tags
+
+
 def _generate_sentence(
     backend: dict[str, Any],
     api_name: str,
@@ -86,9 +112,18 @@ def _generate_sentence(
     voice_payload: dict[str, Any],
     log,
 ) -> str:
+    # Extract paralinguistic tags from sentence
+    cleaned_sentence, para_tags = _extract_paralinguistic_tags(sentence)
+    
+    if para_tags and log:
+        log("DEBUG", "Extracted paralinguistic tags", tags=",".join(f"{k}={v}" for k, v in para_tags.items()))
+    
+    # Use cleaned sentence (without tags) for TTS
+    tts_sentence = cleaned_sentence if SETTINGS.paralingustic_strip_from_narration else sentence
+    
     payload = [
         None,
-        sentence,
+        tts_sentence,
         voice_payload,
         SETTINGS.exaggeration,
         SETTINGS.temperature,
