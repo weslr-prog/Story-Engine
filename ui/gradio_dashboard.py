@@ -18,6 +18,8 @@ import gradio_client.utils as gradio_client_utils
 from ui.studio_backend import (
     MODEL_PROFILE_CHOICES,
     MODEL_PROFILE_QWEN25_Q5,
+    OPERATING_PROFILE_CHOICES,
+    OPERATING_PROFILE_RECOVERY,
     approve_review_marker,
     clear_project_data,
     clear_run_logs,
@@ -359,6 +361,11 @@ def build_app() -> gr.Blocks:
                     value=MODEL_PROFILE_QWEN25_Q5,
                     label="LLM Model Profile",
                 )
+                operating_profile = gr.Dropdown(
+                    choices=OPERATING_PROFILE_CHOICES,
+                    value=OPERATING_PROFILE_RECOVERY,
+                    label="Operating Profile",
+                )
                 start_chapter = gr.Number(value=default_start_chapter, precision=0, label="Start Chapter")
                 last_chapter = gr.Number(value=default_last_chapter, precision=0, label="Last Chapter")
                 chapter_complete_alert = gr.Dropdown(
@@ -382,6 +389,13 @@ def build_app() -> gr.Blocks:
                 word_target_min = gr.Slider(minimum=800, maximum=6000, step=100, value=1800, label="Word Target Min")
                 word_target_max = gr.Slider(minimum=1200, maximum=7000, step=100, value=2400, label="Word Target Max")
                 narration_speed = gr.Slider(minimum=0.7, maximum=1.3, step=0.01, value=1.0, label="Narration Pace")
+            with gr.Accordion("Advanced LLM Parameters", open=False):
+                with gr.Row():
+                    llm_num_ctx = gr.Slider(minimum=1024, maximum=16384, step=512, value=4096, label="Context Window (num_ctx)")
+                    llm_temperature = gr.Slider(minimum=0.0, maximum=2.0, step=0.05, value=0.8, label="Temperature")
+                    llm_timeout = gr.Number(value=900, precision=0, label="LLM Timeout (s)")
+                    llm_max_retries = gr.Slider(minimum=1, maximum=5, step=1, value=2, label="Max Retries")
+                    block_on_lint_fail = gr.Checkbox(label="Block on Lint Fail", value=True)
             with gr.Row():
                 start_run_btn = gr.Button("Start Pipeline")
                 stop_run_btn = gr.Button("Stop Pipeline")
@@ -517,6 +531,7 @@ def build_app() -> gr.Blocks:
             project: str,
             mode_name: str,
             model_choice: str,
+            op_profile: str,
             start_num: float,
             last_num: float,
             min_words: float,
@@ -525,6 +540,11 @@ def build_app() -> gr.Blocks:
             target_chapter: float,
             chapter_exists_action: str,
             alert_mode: str,
+            llm_ctx: float,
+            llm_temp: float,
+            llm_to: float,
+            llm_retries: float,
+            lint_fail_block: bool,
         ) -> str:
             min_i = int(min_words or 0)
             max_i = int(max_words or 0)
@@ -543,6 +563,12 @@ def build_app() -> gr.Blocks:
                 chapter_exists_action or "Prompt each time",
                 model_choice,
                 alert_mode,
+                operating_profile=op_profile or "",
+                llm_num_ctx=int(llm_ctx) if llm_ctx and int(llm_ctx) > 0 else None,
+                llm_temperature=float(llm_temp) if llm_temp is not None and float(llm_temp) >= 0 else None,
+                llm_timeout=int(llm_to) if llm_to and int(llm_to) > 0 else None,
+                llm_max_retries=int(llm_retries) if llm_retries and int(llm_retries) > 0 else None,
+                block_on_lint_fail=bool(lint_fail_block),
             )
 
         def _run_mode_ui(mode_name: str):
@@ -667,6 +693,7 @@ def build_app() -> gr.Blocks:
                 project_dropdown,
                 run_mode,
                 model_profile,
+                operating_profile,
                 start_chapter,
                 last_chapter,
                 word_target_min,
@@ -675,6 +702,11 @@ def build_app() -> gr.Blocks:
                 one_chapter_target,
                 existing_chapter_action,
                 chapter_complete_alert,
+                llm_num_ctx,
+                llm_temperature,
+                llm_timeout,
+                llm_max_retries,
+                block_on_lint_fail,
             ],
             outputs=[dashboard_status],
         )

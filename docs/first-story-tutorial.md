@@ -12,12 +12,14 @@ You will learn:
 ## 1. What You Need Before Starting
 
 1. macOS terminal access
-2. Python virtual environment in this repo
-3. Ollama running on port 11434
-4. Hypura running on port 11435 with a GGUF model
+2. Python virtual environment in this repo (Python 3.9–3.11)
+3. RotorQuant/llama.cpp structural server on port 11436
+4. RotorQuant/llama.cpp prose server on port 11435
 5. Chatterbox TTS UI running on port 7865
 6. ffmpeg installed
 7. a voice sample WAV file in voices/
+
+> **Note:** Ollama can be used as a fallback for either lane. Set `LLM_BACKEND=ollama` in `.env` and start `ollama serve` on the relevant port. The active backend is shown in the Dashboard → Run Dashboard → Service Status panel.
 
 ## 2. Activate Environment
 
@@ -49,34 +51,48 @@ python scripts/preflight.py
 
 You want these to be true:
 - ffmpeg ok: true
-- ollama ok: true
-- hypura ok: true
-- local_disk_kv_model_probe ok: true
+- structural lane listener ok: true (port 11436)
+- prose lane listener ok: true (port 11435)
 - chatterbox_webui ok: true
 
-If one is false, fix that service first (see Troubleshooting section).
+If one is false, fix that service first (see Section 4 and Troubleshooting).
 
 ## 4. Start Services (If Not Already Running)
 
-Use separate terminals.
+The pipeline uses a **dual-lane llama.cpp backend**: one server for structural tasks (chapter planning, scene outlines) and one for prose generation. Both are started via the RotorQuant scripts bundled under `scripts/`.
 
-### 4.1 Ollama
+Use separate terminals (or click **Start Services** in the Dashboard).
 
-```bash
-ollama serve
-```
-
-### 4.2 Hypura
+### 4.1 Structural Lane (port 11436)
 
 ```bash
-bash scripts/start_hypura.sh
+bash scripts/start_rotorquant_structural.sh
 ```
 
-If needed, pass a specific GGUF path:
+The model path is read from `STRUCTURAL_MODEL_PATH` in `.env`. You can override it per-run:
 
 ```bash
-bash scripts/start_hypura.sh "/Volumes/256 M.2/story-engine-models/your-model.gguf"
+STRUCTURAL_MODEL_PATH="/path/to/your-structural.gguf" bash scripts/start_rotorquant_structural.sh
 ```
+
+### 4.2 Prose Lane (port 11435)
+
+```bash
+bash scripts/start_rotorquant_prose.sh
+```
+
+The model path is read from `PROSE_MODEL_PATH` in `.env`. You can override it:
+
+```bash
+PROSE_MODEL_PATH="/path/to/your-prose.gguf" bash scripts/start_rotorquant_prose.sh
+```
+
+**Fallback — Ollama:**
+If you do not have RotorQuant built, Ollama can serve either lane:
+```bash
+ollama serve  # serves both lanes via the URL in .env
+```
+Set `LLM_BACKEND=ollama` in `.env` and update `STRUCTURAL_URL` and `HYPURA_URL` to point at your Ollama instance (default: port 11434).
 
 ### 4.3 Chatterbox TTS UI
 
@@ -159,6 +175,29 @@ Dashboard tabs include:
 - **Voice:** Upload narrator voice sample
 - **Downloads:** Export generated files
 - **Run Dashboard:** Start/stop pipeline, set parameters, reset chapters, approve narration, monitor progress
+
+#### Run Dashboard Controls
+
+| Control | Description |
+|---|---|
+| LLM Model Profile | Active prose model (DavidAU 13.7B, GPT-OSS 20B, Qwen3.5 MLX, Qwen2.5 Q5, Mixtral TurboQuant) |
+| Operating Profile | Preset stack config: **Work** (DavidAU + Qdrant), **Play** (RotorQuant Dual Lane), **Recovery** (Qwen2.5 stable) |
+| Start/Last Chapter | Chapter range for Sequential and Resume modes |
+| Word Target Min/Max | Prose length target per chapter |
+| Narration Pace | TTS speed multiplier (0.7–1.3) |
+| **Advanced LLM Parameters** *(accordion, collapsed by default)* | |
+| Context Window (num_ctx) | Tokens available to the LLM per call (1024–16384, default 4096) |
+| Temperature | Sampling temperature (0–2, default 0.8) |
+| LLM Timeout (s) | Max seconds per LLM call before retry (default 900) |
+| Max Retries | Retry attempts per failing call (1–5, default 2) |
+| Block on Lint Fail | If unchecked, pipeline continues even when prose fails quality checks |
+
+#### Operating Profiles vs. Model Profiles
+
+- **Operating Profile** sets the full stack preset (backend type, memory backend, which model profile is active by default).
+- **Model Profile** overrides just the LLM model for prose generation.
+
+The two can be mixed — e.g., use the *Recovery* operating profile (stable RotorQuant) but swap in the *DavidAU* model profile for prose quality.
 
 You can run the pipeline from the Dashboard UI *or* from the CLI (`python main.py run ...`). Both use the same backend.
 

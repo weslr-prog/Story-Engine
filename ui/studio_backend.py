@@ -81,6 +81,7 @@ DAVIDAU_WORK_MODEL_DEFAULT = "hf.co/DavidAU/L3.1-MOE-2X8B-Deepseek-DeepHermes-e3
 MODEL_PROFILE_CHOICES = [
     MODEL_PROFILE_DAVIDAU_WORK,
     MODEL_PROFILE_GPT_OSS20B_Q4,
+    MODEL_PROFILE_MIXTRAL_HYPURA,
     MODEL_PROFILE_QWEN35,
     MODEL_PROFILE_QWEN25_Q5,
 ]
@@ -1819,6 +1820,11 @@ def start_pipeline_run(
     chapter_complete_alert: str = "double_beep",
     chapter_limit: int | str | None = None,
     operating_profile: str = "",
+    llm_num_ctx: int | None = None,
+    llm_temperature: float | None = None,
+    llm_timeout: int | None = None,
+    llm_max_retries: int | None = None,
+    block_on_lint_fail: bool | None = None,
 ) -> str:
     state = _runner_state()
     if _running_pid(state.get("pid")):
@@ -2010,6 +2016,16 @@ def start_pipeline_run(
 
     if narration_speed is not None and float(narration_speed) > 0:
         env["NARRATION_SPEED"] = f"{float(narration_speed):.2f}"
+    if llm_num_ctx is not None and int(llm_num_ctx) > 0:
+        env["LLM_NUM_CTX"] = str(int(llm_num_ctx))
+    if llm_temperature is not None and float(llm_temperature) >= 0:
+        env["LLM_TEMPERATURE"] = f"{float(llm_temperature):.2f}"
+    if llm_timeout is not None and int(llm_timeout) > 0:
+        env["LLM_CALL_TIMEOUT_SECONDS"] = str(int(llm_timeout))
+    if llm_max_retries is not None and int(llm_max_retries) > 0:
+        env["LLM_MAX_RETRIES"] = str(int(llm_max_retries))
+    if block_on_lint_fail is not None:
+        env["BLOCK_ON_LINT_FAIL"] = "true" if block_on_lint_fail else "false"
     env["PYTHONUNBUFFERED"] = "1"
 
     RUNNER_STATE_DIR.mkdir(parents=True, exist_ok=True)
