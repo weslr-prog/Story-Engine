@@ -1,13 +1,48 @@
 {
-  "title": "Glass Meridian",
-  "logline": "A forensic archivist uncovers a city-wide memory rewrite tied to her vanished sister.",
+  "title": "Untitled Story",
+  "genre": "Science fiction / psychological thriller with cosmic horror elements",
+  "tone": "The terrifying loneliness of being chosen — and how that can feel like love when you've never been chosen before.",
+  "setting": {
+    "time": "Approximately 250 years in the future — edge of explored space",
+    "place": "(with Genre‑Specific Depth) ### The World – One Paragraph The Hermes Relay Station orbits Eris‑3B at a distance of 42,000 kilometers — close enough to monitor, far enough to feel safe"
+  },
+  "pov": {
+    "type": "third_person_limited",
+    "whose": "Aris Thorne"
+  },
+  "total_chapters": 10,
   "themes": [
-    "truth",
-    "identity",
-    "cost of certainty"
+    "The terrifying loneliness of being chosen — and how that can feel like love when you've never been chosen before.",
+    "Beneath the plot of a mysterious signal and a corporate cover‑up, *The Last Signal* explores a single human truth: **the hunger to be wanted can override every survival instinct.** The story asks whether connection — even a connection with something unknowable and possibly dangerous — is worth the cost of everything else. It questions if loneliness is a wound that can be exploited, and whether the voice you’ve been waiting for is always a friend. The answer is not given. The reader is left with the echo of the question: *What would you listen to, if no one else was speaking?* --- ## 5. THREE‑ACT SKELETON **Total chapters:** 10 **Act breakdown:** Act 1 = Chapters 1–3 (30%), Act 2 = Chapters 4–8 (50%), Act 3 = Chapters 9–10 (20%) ### Act 1 — Setup (Chapters 1–3) - **Chapter 1:** Establish Aris’s routine, his isolation, his obsessive work habits. Inciting incident: The signal appears during a diagnostic sweep. Aris reports it to Vann. She orders him to log it and wait. He does not wait. - **Chapter 2:** Aris begins decoding the signal privately. It reveals a repeating pattern — mathematical, then linguistic. He lies to Vann about his progress. Mira notices he’s working odd hours. - **Chapter 3:** The signal changes in response to Aris’s decoding. First hint of adaptation. Jonah volunteers to help. Aris says no — but Jonah has already seen the logs. ### Act 2 — Escalation (Chapters 4–8) - **Chapter 4:** The signal begins asking questions. Aris answers (unofficially). Vann grows suspicious. Mira finds an old backup of Kael Stroud’s logs — he saw the same signal. - **Chapter 5:** Kael’s logs reveal that Stellaris Communications knew about the signal and classified it. Aris realizes the company is not coming to help — they are coming to erase. - **Chapter 6:** Darkest moment (midpoint). Aris makes direct contact with the signal. It says something personal about his mother. He cannot explain how it knows. - **Chapter 7:** Jonah, without permission, transmits a response to the signal. Something transmits back — a set of coordinates. On Eris‑3B. Jonah collapses. (Expendable consequences.) - **Chapter 8:** Vann confronts Aris. She has proof of his deception. She gives him an ultimatum: shut down the signal investigation or be arrested when the next supply ship arrives. ### Act 3 — Climax & Resolution (Chapters 9–10) - **Chapter 9:** Aris faces the choice. The signal offers something no one else has — “Come. You were always meant to hear this.” He must decide whether to follow the coordinates or obey Vann. Climactic confrontation in the Communications Bay. - **Chapter 10:** Resolution. The signal’s true nature is *not* revealed clearly. But Aris makes a final choice. The reader understands what he lost and what he gained. Final image: Eris‑3B through the viewport, unchanged, waiting. --- ## 6. RELATIONSHIP TENSION MAP | Character A | Character B | Core Tension / Secret | |-------------|-------------|------------------------| | Aris Thorne | Commander Vann | Aris needs Vann’s trust to keep working; Vann needs to enforce rules to protect the crew. Both are right. Both are hiding fear. | | Aris Thorne | The Eris Signal | Aris wants to be chosen; the signal appears to choose him. The tension: Is this love, predation, or simply physics? | | Aris Thorne | Mira Chen | Mira suspects Aris is lying but admires his competence. She wants to help but fears the cost of involvement. | | Aris Thorne | Jonah Reeve | Jonah idolizes Aris; Aris sees his younger self in Jonah. The tension: Aris must decide whether to protect Jonah or use him. | | Commander Vann | Mira Chen | Vann trusts Mira’s technical reports but not her judgment. Mira resents Vann’s coldness but understands its origins. | | Jonah Reeve | The Signal | Jonah believes the truth is always worth the cost. The signal exploits that belief. Tension: naivety vs. manipulation. | | Kael Stroud (red herring) | Stellaris Communications | Kael discovered the cover‑up. The company silenced him. Tension: truth vs. corporate survival. | --- ## SAVE THIS DOCUMENT **Phase 2 complete.** You now have: - Complete Setting Profile with World Rules and Location Glossary - Full Character Roster (6 characters, all required roles filled) - Tone and Style Rules (10 rules) - Theme Statement - Three‑Act Skeleton (10 chapters) - Relationship Tension Map (7 dynamics) **Next step:** Run Phase 3 (Chapter Blueprint) using this Story Bible. Would you like me to proceed to Phase 3, or would you like to adjust any character or setting details before we continue?"
   ],
-  "world_facts": [
-    "The city of Meridian records civic memory snapshots nightly.",
-    "Unauthorized memory edits are treated as terrorism."
+  "chapter_outline": [
+    "Ch1 The Diagnostic",
+    "Ch2 The First Decode",
+    "Ch3 The First Response",
+    "Ch4 The Old Logs",
+    "Ch5 The Corporate Thread",
+    "Ch6 The Midpoint: What It Knows",
+    "Ch7 The Expendable",
+    "Ch8 The Ultimatum",
+    "Ch9 The Choice",
+    "Ch10 What Waits"
+  ],
+  "world_rules": [
+    "(with Genre‑Specific Depth) ### The World – One Paragraph The Hermes Relay Station orbits Eris‑3B at a distance of 42,000 kilometers — close enough to monitor, far enough to feel safe. The station is a utilitarian cylinder of grey alloy, solar arrays, and communication dishes, designed by engineers who valued function over psychology. Inside, narrow corridors connect three sleeping pods, a mess with one viewport, a medical locker, and the nerve center: the Communications Bay. The air is recycled, sterile, with a faint metallic tang. The only natural light comes from Eris‑3B itself — a dead, grey‑brown marble that fills the viewport, unchanging, unblinking. The station’s crew of three works eighteen‑month rotations. They are not friends; they are professionals enduring proximity. The culture is one of polite distance, scheduled conversations, and the unspoken knowledge that anyone here chose this isolation. Outside, there is only vacuum and silence. The signal changed that. ### Rules of the World (High Worldbuilding Depth Required) Because the Genre Calibration Report specified Medium‑High worldbuilding depth, the following rules define the physical and social reality of the story: - **No Faster‑Than‑Light Communication.** Signals between the Hermes station and Earth take approximately 14 hours to travel one way. There is no real‑time contact. All orders, reports, and personal messages have a latency that forces autonomy — and isolation. - **The Relay Station Cannot Leave Orbit.** Hermes is not a ship. It has no propulsion system beyond orbital station‑keeping thrusters. If something goes wrong, the crew cannot fly away. They can only wait for a rescue that would take months to arrive. - **Stellaris Communications Classifies All Anomalies.** Corporate protocol requires any unexplained signal to be reported immediately and then ignored until headquarters provides analysis. Unauthorized response is a termination‑level offense. The penalty is not just losing a job — it is losing access to any deep‑space position ever again. - **The Eris‑3B Atmosphere Collapse (Historical Rule).** Two hundred years ago, a runaway greenhouse effect turned Eris‑3B’s breathable atmosphere into a toxic soup of sulfur compounds and carbon dioxide. Surface temperature now averages 180°C. No known organic life can survive. Any signal originating from the surface violates at least three laws of physics — or suggests that someone’s definition of “life” was dangerously narrow. ### Location Glossary (3 Key Locations) | Location | Sensory Anchor | Narrative Function | |----------|----------------|---------------------| | **The Communications Bay** | The constant, low‑frequency hum of the main receiver array. Screens glow blue‑white. The headset smells faintly of recycled sweat. | Where Aris hears the signal. His sanctuary and his trap. | | **The Mess Viewport** | A scratched, thick‑glass window that faces Eris‑3B. The planet never moves — it just hangs there, grey and patient. The coffee always tastes slightly burnt. | Where the crew confronts each other and themselves. The planet watches. | | **The Maintenance Shaft C‑7** | A narrow, unlit tunnel lined with coolant pipes that vibrate at different frequencies. The air is cold and stale. Sound echoes strangely. | Where Aris hides when he falsifies logs or makes unauthorized transmissions. The station’s dark heart. | ---",
+    "A lonely communications technician must determine whether a repeating distress signal from a dead planet is a cry for help, a malfunction, or something intelligent that has learned exactly what to say to make him come closer."
+  ],
+  "writing_rules": [
+    "Point of View:** Third person limited, tightly focused on Aris Thorne. The reader knows only what Aris knows, feels only what he feels. The signal’s true nature remains ambiguous because Aris himself cannot be certain.",
+    "Tense:** Past tense. (e.g., “Aris pressed the headset against his ear. The signal repeated. It sounded the same. It was not the same.”)",
+    "Dialogue style:** Somewhere between short‑clipped and naturalistic. Characters say what they mean only when under pressure; otherwise, they deflect. Vann speaks in protocol fragments. Mira hides behind tech talk. Aris becomes more precise when he lies.",
+    "Pacing philosophy:** Ratchet and release (as per Genre Calibration Report). Odd chapters (1,3,5,7,9) advance tension through discovery or conflict. Even chapters (2,4,6,8,10) deepen interiority — doubt, memory, paranoia. The final two chapters (9–10) accelerate without release.",
+    "What this story does well:**",
+    "Atmosphere of isolation (sound, silence, the viewport)",
+    "Psychological dread (what the signal might be, not what it does)",
+    "Moral ambiguity (no clean choices)",
+    "Slow revelation (clues buried in routine logs)",
+    "What this story explicitly avoids (from Phase 1):**",
+    "Graphic violence (threat is implied, not shown)",
+    "Explicit sexual content"
   ]
 }

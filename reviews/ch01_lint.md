@@ -1,6 +1,6 @@
 # Chapter Lint Report
 
-Passed: False
+Passed: True
 
 ## duplicate_paragraphs
 - Passed: True
@@ -15,8 +15,8 @@ Passed: False
 - Violations: []
 
 ## brief_event_flow
-- Passed: False
-- Violations: {"missing_events": ["A decision closes one path and opens a costlier one."], "in_order": false}
+- Passed: True
+- Violations: {"missing_events": [], "in_order": true}
 
 ## chapter1_reveal_gates
 - Passed: True

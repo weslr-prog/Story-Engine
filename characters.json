@@ -1,16 +1,37 @@
 [
   {
-    "name": "Mara Quill",
-    "role": "protagonist",
-    "core_wound": "She failed to protect her sister during a prior data purge.",
-    "flawed_belief": "Control is safer than trust.",
-    "voice_style": "precise, emotionally guarded"
+    "name": "Aris Thorne",
+    "role": "Protagonist / Deep‑Space Communications Technician",
+    "age_or_range": 38,
+    "short_description": "",
+    "voice_style": "Soft‑spoken, precise, with a tendency to over‑explain. When stressed, his sentences become shorter. He rarely initiates physical contact. He laughs like someone who forgot how."
   },
   {
-    "name": "Ivo Vale",
-    "role": "ally",
-    "core_wound": "Expelled for exposing corruption.",
-    "flawed_belief": "Truth alone saves people.",
-    "voice_style": "dry wit, blunt honesty"
+    "name": "The Eris Signal (no proper name; referred to in logs as “Anomaly 734‑Theta”)",
+    "role": "Antagonist / Unknowable Entity",
+    "age_or_range": "Unknown — first detected 200 years ago, but current iteration is 47 days old as of Chapter 1",
+    "short_description": "",
+    "voice_style": "If it could speak, it would sound patient. Inevitable. Like someone who has waited two hundred years and can wait a little longer."
+  },
+  {
+    "name": "Commander Elara Vann",
+    "role": "Station Commander / Authority Figure",
+    "age_or_range": 52,
+    "short_description": "",
+    "voice_style": "Short, clipped sentences. Rarely uses first names. Her silences are louder than her words."
+  },
+  {
+    "name": "Jonah Reeve",
+    "role": "Junior Technician / Expendable",
+    "age_or_range": 29,
+    "short_description": "",
+    "voice_style": "Talks too fast when excited. Laughs nervously. Drops formal titles."
+  },
+  {
+    "name": "Kael Stroud (never appears on screen — only referenced)",
+    "role": "Red Herring / Off‑stage presence",
+    "age_or_range": "Unknown — previous technician, rotation ended 8 months ago",
+    "short_description": "",
+    "voice_style": "Based on logs: urgent, fragmented, increasingly paranoid."
   }
 ]

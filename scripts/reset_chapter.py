@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import shutil
 from pathlib import Path
 
@@ -54,6 +55,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Delete generated artifacts for one chapter.")
     parser.add_argument("--chapter", type=int, required=True, help="Chapter number, e.g. 1 for ch01")
     parser.add_argument("--dry-run", action="store_true", help="Show deletions without deleting files")
+    parser.add_argument("--project", default="The-Last-Signal", help="Project name for checkpoint reset (default: The-Last-Signal)")
     args = parser.parse_args()
 
     ch = _chapter_tag(args.chapter)
@@ -68,6 +70,20 @@ def main() -> None:
         print(f"Dry run complete. {deleted} items would be removed.")
     else:
         print(f"Reset complete. {deleted} items removed.")
+
+    # Also reset the pipeline checkpoint so the chapter gets re-run
+    checkpoint_path = ROOT / ".state" / "checkpoints" / f"{args.project}.json"
+    if checkpoint_path.exists():
+        try:
+            data = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+            if data.get("next_chapter", 1) > args.chapter:
+                if not args.dry_run:
+                    data["next_chapter"] = args.chapter
+                    data["reason"] = "manual_reset"
+                    checkpoint_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+                print(f"Checkpoint reset: next_chapter → {args.chapter}")
+        except Exception as e:
+            print(f"WARN: could not reset checkpoint: {e}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
-  "passed": false,
+  "passed": true,
   "checks": [
     {
       "name": "duplicate_paragraphs",
@@ -18,12 +18,10 @@
     },
     {
       "name": "brief_event_flow",
-      "passed": false,
+      "passed": true,
       "violations": {
-        "missing_events": [
-          "A decision closes one path and opens a costlier one."
-        ],
-        "in_order": false
+        "missing_events": [],
+        "in_order": true
       }
     },
     {

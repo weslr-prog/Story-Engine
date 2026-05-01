@@ -16,7 +16,7 @@ _META_DEFAULTS = [
     "as a character",
     "prompt",
     "model",
-    "ai",
+    # "ai" removed: too broad — in-world sci-fi prose legitimately refers to AI entities
 ]
 
 

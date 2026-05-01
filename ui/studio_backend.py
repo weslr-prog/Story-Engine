@@ -12,15 +12,12 @@ import re
 from contextlib import closing
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
+
+import requests
 
 from scripts.convert_story_engine import Inputs, convert_rule, write_prompt
-from scripts.preflight import (
-    check_chatterbox,
-    check_ffmpeg,
-    check_local_disk_kv,
-    check_ollama,
-    discover_api_names,
-)
+from scripts import preflight as _preflight
 from config import SETTINGS
 from ui.session_manager import (
     ROOT,
@@ -34,13 +31,67 @@ from ui.session_manager import (
     set_active_project,
 )
 
+# Preflight API compatibility across repo revisions.
+check_chatterbox = _preflight.check_chatterbox
+check_ffmpeg = _preflight.check_ffmpeg
+check_hypura = _preflight.check_hypura
+check_local_disk_kv = _preflight.check_local_disk_kv
+check_ollama = _preflight.check_ollama
+discover_api_names = _preflight.discover_api_names
+
+
+def check_structural_lane(model_name: str | None = None) -> tuple[bool, str]:
+    fn = getattr(_preflight, "check_structural_lane", None)
+    if callable(fn):
+        return fn(model_name)
+    return check_local_disk_kv()
+
+
+def check_prose_lane(model_name: str | None = None) -> tuple[bool, str]:
+    fn = getattr(_preflight, "check_prose_lane", None)
+    if callable(fn):
+        return fn(model_name)
+    return check_hypura()
+
+
+def check_mlx_endpoint(url: str) -> tuple[bool, str]:
+    fn = getattr(_preflight, "check_mlx_endpoint", None)
+    if callable(fn):
+        return fn(url)
+    try:
+        parts = urlsplit((url or "").strip())
+        if not parts.scheme or not parts.netloc:
+            return False, f"invalid MLX_URL: {url}"
+        probe = f"{parts.scheme}://{parts.netloc}/"
+        resp = requests.get(probe, timeout=4)
+        return True, f"{probe} HTTP {resp.status_code}"
+    except Exception as exc:
+        return False, str(exc)
+
 REQUIRED_SOURCE_KEYS = ["dna", "bible", "blueprint"]
 REQUIRED_CONVERSION_KEYS = ["dna", "bible", "blueprint", "style_guide"]
 REQUIRED_GUIDE_KEYS = ["style_guide", "consistency"]
 SUPPORTED_VOICE_EXTENSIONS = (".wav", ".mp3", ".flac", ".ogg", ".m4a")
 MODEL_PROFILE_QWEN35 = "Qwen3.5-9B Non-thinking (MLX)"
-MODEL_PROFILE_QWEN25_Q5 = "Qwen2.5-7B-Instruct-Q5 (Ollama)"
-MODEL_PROFILE_CHOICES = [MODEL_PROFILE_QWEN35, MODEL_PROFILE_QWEN25_Q5]
+MODEL_PROFILE_QWEN25_Q5 = "Qwen2.5-7B-Instruct-Q5 (Llama.cpp Recovery)"
+MODEL_PROFILE_GPT_OSS20B_Q4 = "GPT-OSS-20B Q4_K_M (Llama.cpp Prose)"
+MODEL_PROFILE_MIXTRAL_HYPURA = "Mixtral-8x7B TurboQuant (Llama.cpp)"
+MODEL_PROFILE_DAVIDAU_WORK = "Work Default - DavidAU 13.7B Q3_K_L (Llama.cpp)"
+DAVIDAU_WORK_MODEL_DEFAULT = "hf.co/DavidAU/L3.1-MOE-2X8B-Deepseek-DeepHermes-e32-uncensored-abliterated-13.7B-gguf:Q3_K_L"
+MODEL_PROFILE_CHOICES = [
+    MODEL_PROFILE_DAVIDAU_WORK,
+    MODEL_PROFILE_GPT_OSS20B_Q4,
+    MODEL_PROFILE_QWEN35,
+    MODEL_PROFILE_QWEN25_Q5,
+]
+OPERATING_PROFILE_WORK = "Work - DavidAU 13.7B Q3_K_L + Qdrant"
+OPERATING_PROFILE_PLAY = "Play - RotorQuant Dual Lane"
+OPERATING_PROFILE_RECOVERY = "Recovery - Stable RotorQuant (Qwen2.5 7B)"
+OPERATING_PROFILE_CHOICES = [
+    OPERATING_PROFILE_WORK,
+    OPERATING_PROFILE_PLAY,
+    OPERATING_PROFILE_RECOVERY,
+]
 LAST_SIGNAL_FILE_CANDIDATES = {
     "dna": ["Phase 1 - Story DNA Summary.txt", "Story DNA Summary.txt", "Story DNA.txt"],
     "bible": ["Phase 2 - Story Bible.txt", "Story Bible.txt"],
@@ -65,17 +116,148 @@ def _coerce_int(value: Any, default: int = 0) -> int:
         return default
 
 
-def _model_profile_runtime(model_profile: str | None) -> tuple[str, str]:
+def _default_prose_url() -> str:
+    return str(
+        getattr(
+            SETTINGS,
+            "prose_url",
+            getattr(SETTINGS, "hypura_url", "http://127.0.0.1:11435/v1/chat/completions"),
+        )
+    )
+
+
+def _model_profile_runtime(model_profile: str | None) -> tuple[str, str, str]:
     chosen = (model_profile or "").strip()
+    if chosen == MODEL_PROFILE_DAVIDAU_WORK:
+        return (
+            os.getenv("WORK_PROSE_URL", os.getenv("PROSE_URL", _default_prose_url())),
+            os.getenv("WORK_PROSE_MODEL", DAVIDAU_WORK_MODEL_DEFAULT),
+            "dual",
+        )
+    if chosen == MODEL_PROFILE_GPT_OSS20B_Q4:
+        return (
+            os.getenv("PROSE_URL", _default_prose_url()),
+            os.getenv("PROSE_MODEL", "gpt_oss_20b_mxfp4_moe2"),
+            "dual",
+        )
+    if chosen == MODEL_PROFILE_MIXTRAL_HYPURA:
+        return (
+            os.getenv("PROSE_URL", _default_prose_url()),
+            os.getenv("PROSE_MODEL", "mixtral-8x7b-instruct-turboquant"),
+            "dual",
+        )
     if chosen == MODEL_PROFILE_QWEN35:
         return (
             os.getenv("QWEN35_MLX_URL", "http://127.0.0.1:8080/v1/chat/completions"),
             os.getenv("QWEN35_MLX_MODEL", "caiovicentino1/Qwen3.5-9B-HLWQ-MLX-4bit"),
+            "mlx",
         )
     # Default to the lower-memory profile.
     return (
-        os.getenv("QWEN25_OLLAMA_URL", "http://127.0.0.1:11434/v1/chat/completions"),
-        os.getenv("QWEN25_OLLAMA_MODEL", "qwen2.5:7b-instruct-q5_K_M"),
+        os.getenv("PROSE_URL", _default_prose_url()),
+        os.getenv("PROSE_MODEL", "moe_qwen25_2x7b_q3ks"),
+        "dual",
+    )
+
+
+def _model_profile_runtime_env(model_profile: str | None) -> dict[str, str]:
+    chosen = (model_profile or "").strip()
+    if chosen == MODEL_PROFILE_DAVIDAU_WORK:
+        context = os.getenv("WORK_DUAL_CONTEXT", os.getenv("WORK_OLLAMA_CONTEXT", "8192")).strip() or "8192"
+        return {
+            "LLM_NUM_CTX": context,
+            "LLM_BACKEND": "dual",
+            "USE_LOCAL_DISK_KV": "false",
+        }
+    if chosen == MODEL_PROFILE_GPT_OSS20B_Q4:
+        context = os.getenv("PLAY_HYPURA_CONTEXT", "4096").strip() or "4096"
+        return {
+            "LLM_NUM_CTX": context,
+            "KV_CACHE_TYPE": "rotorquant_q8_0",
+            "LLM_BACKEND": "dual",
+            "USE_LOCAL_DISK_KV": "false",
+        }
+    if chosen == MODEL_PROFILE_MIXTRAL_HYPURA:
+        return {
+            "LLM_NUM_CTX": "4096",
+            "KV_CACHE_TYPE": "rotorquant_q8_0",
+            "LLM_BACKEND": "dual",
+            "USE_LOCAL_DISK_KV": "false",
+        }
+    return {}
+
+
+def _service_root(endpoint: str) -> str:
+    parts = urlsplit((endpoint or "").strip())
+    if not parts.scheme or not parts.netloc:
+        return endpoint
+    return f"{parts.scheme}://{parts.netloc}"
+
+
+def _structural_endpoint() -> str:
+    return os.getenv(
+        "STRUCTURAL_URL",
+        getattr(SETTINGS, "structural_url", getattr(SETTINGS, "local_disk_kv_url", "http://127.0.0.1:11436/v1/chat/completions")),
+    )
+
+
+def _prose_endpoint() -> str:
+    return os.getenv(
+        "PROSE_URL",
+        getattr(SETTINGS, "prose_url", getattr(SETTINGS, "hypura_url", "http://127.0.0.1:11435/v1/chat/completions")),
+    )
+
+
+def _memory_backend_name() -> str:
+    return str(getattr(SETTINGS, "memory_backend", "chroma"))
+
+
+def _check_service_listener(endpoint: str, timeout_s: int = 4) -> tuple[bool, str]:
+    probe = _service_root(endpoint).rstrip("/") + "/"
+    try:
+        resp = requests.get(probe, timeout=timeout_s)
+        return True, f"root HTTP {resp.status_code}"
+    except Exception as exc:
+        return False, f"root probe failed: {exc}"
+
+
+def _hypura_inventory_ok(endpoint: str, model_name: str, timeout_s: int = 6) -> tuple[bool, str]:
+    tags_endpoint = _service_root(endpoint).rstrip("/") + "/api/tags"
+    try:
+        resp = requests.get(tags_endpoint, timeout=timeout_s)
+        if not resp.ok:
+            return False, f"inventory HTTP {resp.status_code} at {tags_endpoint}"
+        payload = resp.json()
+        models = [m.get("name", "") for m in payload.get("models", []) if isinstance(m, dict)]
+        if model_name in models:
+            return True, f"configured model present in inventory ({model_name})"
+        preview = ", ".join(models[:6]) if models else "none"
+        return False, f"configured model missing ({model_name}); available: {preview}"
+    except Exception as exc:
+        return False, f"inventory check failed at {tags_endpoint}: {exc}"
+
+
+def get_operating_profile_defaults(profile_name: str | None) -> tuple[str, int, int, str]:
+    selected = (profile_name or "").strip()
+    if selected == OPERATING_PROFILE_WORK:
+        return (
+            MODEL_PROFILE_DAVIDAU_WORK,
+            1600,
+            2400,
+            "Work profile selected: dual-lane llama.cpp profile with Qdrant memory.",
+        )
+    if selected == OPERATING_PROFILE_PLAY:
+        return (
+            MODEL_PROFILE_GPT_OSS20B_Q4,
+            1400,
+            2200,
+            "Play profile selected: dual llama.cpp RotorQuant path with Qdrant memory.",
+        )
+    return (
+        MODEL_PROFILE_QWEN25_Q5,
+        1200,
+        1800,
+        "Recovery profile selected: stable dual-lane llama.cpp profile for safe completion.",
     )
 
 STYLE_GUIDE_TEMPLATE = """# Style Guide\n\n## Narrative POV and Tense\n- Use third person limited (primarily protagonist).\n- Use past tense consistently.\n\n## Voice and Diction\n- Prefer concrete verbs and precise nouns over abstract phrasing.\n- Keep dialogue natural and subtext-forward; avoid exposition dumps.\n- Avoid meta commentary about writing process.\n\n## Scene Construction\n- Every scene must do at least one: advance plot, deepen character, or escalate tension.\n- Keep transitions clear in time/place without long setup paragraphs.\n- End chapters on consequence-driven forward pull.\n\n## Prohibited Patterns\n- No repeated paragraph loops.\n- No out-of-world references (AI/model/prompt/author language).\n- Avoid early reveal leaks from future chapters.\n"""
@@ -626,6 +808,7 @@ def get_project_voice_download_path(project_name: str, voice_name: str) -> str |
 
 RUNNER_STATE_DIR = ROOT / ".state"
 RUNNER_STATE_FILE = RUNNER_STATE_DIR / "pipeline_runner.json"
+SERVICE_STATE_DIR = RUNNER_STATE_DIR / "services"
 
 
 def _read_json(path: Path, default: Any) -> Any:
@@ -664,6 +847,236 @@ def _runner_state() -> dict[str, Any]:
 
 def _save_runner_state(state: dict[str, Any]) -> None:
     _write_json(RUNNER_STATE_FILE, state)
+
+
+def _profile_service_log_path(service_name: str) -> Path:
+    SERVICE_STATE_DIR.mkdir(parents=True, exist_ok=True)
+    return SERVICE_STATE_DIR / f"{service_name}.log"
+
+
+def _launch_background_service(command: list[str], service_name: str, env: dict[str, str] | None = None) -> str:
+    log_path = _profile_service_log_path(service_name)
+    with log_path.open("a", encoding="utf-8") as handle:
+        handle.write(f"\n[{time.strftime('%Y-%m-%d %H:%M:%S')}] launch: {' '.join(command)}\n")
+        subprocess.Popen(
+            command,
+            cwd=str(ROOT),
+            stdout=handle,
+            stderr=subprocess.STDOUT,
+            env=env or os.environ.copy(),
+        )
+    return str(log_path)
+
+
+def _poll_service(check_fn, timeout_s: int = 25, interval_s: float = 1.0) -> tuple[bool, str]:
+    deadline = time.time() + timeout_s
+    last_detail = "not started"
+    while time.time() < deadline:
+        ok, detail = check_fn()
+        last_detail = detail
+        if ok:
+            return True, detail
+        time.sleep(interval_s)
+    return False, last_detail
+
+
+def _resolve_hypura_model_path(model_name: str, model_profile: str | None = None) -> Path | None:
+    if not model_name:
+        return None
+    explicit_paths: list[str] = []
+    chosen = (model_profile or "").strip()
+    if chosen == MODEL_PROFILE_DAVIDAU_WORK:
+        explicit_paths.append(os.getenv("WORK_HYPURA_MODEL_PATH", ""))
+    elif chosen in {MODEL_PROFILE_GPT_OSS20B_Q4, MODEL_PROFILE_MIXTRAL_HYPURA}:
+        explicit_paths.append(os.getenv("PLAY_HYPURA_MODEL_PATH", ""))
+    explicit_paths.append(os.getenv("HYPURA_MODEL_PATH", ""))
+    for raw in explicit_paths:
+        if raw:
+            candidate = Path(raw).expanduser()
+            if candidate.exists() and candidate.is_file():
+                return candidate
+
+    default_models_dir = Path(str(getattr(SETTINGS, "hypura_models_dir", ROOT / "models" / "gguf"))).expanduser()
+    local_models_dir = ROOT / "models" / "gguf"
+    if local_models_dir.exists() and local_models_dir.is_dir():
+        default_models_dir = local_models_dir
+    models_dir = Path(os.getenv("HYPURA_MODELS_DIR", str(default_models_dir))).expanduser()
+    direct = models_dir / f"{model_name}.gguf"
+    if direct.exists() and direct.is_file():
+        return direct
+
+    sanitized = model_name.rsplit("/", 1)[-1]
+    fallback = models_dir / f"{sanitized}.gguf"
+    if fallback.exists() and fallback.is_file():
+        return fallback
+    return None
+
+
+def _resolve_prose_model_path(model_name: str, model_profile: str | None = None) -> Path | None:
+    if not model_name:
+        return None
+    # Prefer direct model-name resolution first so profile/env model overrides apply.
+    local_first = _resolve_hypura_model_path(model_name, model_profile)
+    if local_first is not None:
+        return local_first
+    explicit_paths: list[str] = []
+    chosen = (model_profile or "").strip()
+    if chosen == MODEL_PROFILE_DAVIDAU_WORK:
+        explicit_paths.append(os.getenv("WORK_PROSE_MODEL_PATH", ""))
+    elif chosen == MODEL_PROFILE_GPT_OSS20B_Q4:
+        explicit_paths.append(os.getenv("GPT_OSS20B_HYPURA_MODEL_PATH", ""))
+    explicit_paths.append(os.getenv("PROSE_MODEL_PATH", ""))
+    explicit_paths.append(os.getenv("HYPURA_MODEL_PATH", ""))
+    for raw in explicit_paths:
+        if raw:
+            candidate = Path(raw).expanduser()
+            if candidate.exists() and candidate.is_file():
+                return candidate
+    return _resolve_hypura_model_path(model_name, model_profile)
+
+
+def _script_path(*candidates: str) -> Path | None:
+    for name in candidates:
+        candidate = ROOT / "scripts" / name
+        if candidate.exists() and candidate.is_file():
+            return candidate
+    return None
+
+
+def _mlx_server_command(endpoint: str, model_name: str) -> list[str]:
+    parts = urlsplit((endpoint or "").strip())
+    port = str(parts.port or 8080)
+    return [sys.executable, "-m", "mlx_lm.server", "--model", model_name, "--port", port]
+
+
+def start_services_for_profile(profile_name: str, model_profile: str | None = None) -> str:
+    selected_profile = (profile_name or OPERATING_PROFILE_RECOVERY).strip()
+    resolved_model_profile, _, _, profile_note = get_operating_profile_defaults(selected_profile)
+    chosen_model_profile = (model_profile or resolved_model_profile).strip() or resolved_model_profile
+    endpoint, model_name, backend = _model_profile_runtime(chosen_model_profile)
+    structural_model = os.getenv("STRUCTURAL_MODEL", os.getenv("QWEN25_OLLAMA_MODEL", "tinyllama-1.1b-chat-v1.0.Q2_K"))
+    runtime_env = os.environ.copy()
+    runtime_env.update(_model_profile_runtime_env(chosen_model_profile))
+
+    notes = [profile_note, f"Resolved model profile: {chosen_model_profile}"]
+    if backend in {"hypura", "openclaw"}:
+        notes.append(
+            "Runtime tuning: "
+            f"ctx={runtime_env.get('HYPURA_CONTEXT', 'default')} | "
+            f"kv={runtime_env.get('HYPURA_FORCE_KV_QUANT', 'auto')}"
+        )
+
+    chatterbox_ok, chatterbox_detail = check_chatterbox()
+    if not chatterbox_ok:
+        log_path = _launch_background_service(["bash", str(ROOT / "scripts" / "start_chatterbox_tts_ui.sh")], "chatterbox")
+        ok, detail = _poll_service(check_chatterbox, timeout_s=30)
+        notes.append(f"Chatterbox {'started' if ok else 'start attempted'} ({detail}). Log: {log_path}")
+    else:
+        notes.append(f"Chatterbox already available ({chatterbox_detail}).")
+
+    if backend in {"local_disk_kv", "hypura", "openclaw"}:
+        local_ok, local_detail = check_local_disk_kv()
+        if not local_ok:
+            if shutil.which("ollama") is None:
+                notes.append("Ollama is required but not installed on PATH.")
+            else:
+                log_path = _launch_background_service(["ollama", "serve"], "ollama")
+                ok, detail = _poll_service(check_local_disk_kv, timeout_s=20)
+                notes.append(f"Ollama {'started' if ok else 'start attempted'} ({detail}). Log: {log_path}")
+        else:
+            notes.append(f"Ollama/local_disk_kv already available ({local_detail}).")
+
+    if backend in {"dual", "rotorquant", "llama-server"}:
+        structural_endpoint = _structural_endpoint()
+        prose_endpoint = _prose_endpoint()
+        structural_ok, structural_detail = _check_service_listener(structural_endpoint)
+        prose_ok, prose_detail = _check_service_listener(prose_endpoint)
+        if not structural_ok:
+            structural_script = _script_path("start_rotorquant_structural.sh", "start_hypura.sh")
+            if structural_script is None:
+                notes.append("Structural launcher script not found under scripts/.")
+            else:
+                structural_env = runtime_env.copy()
+                structural_env.setdefault("HYPURA_PORT", "11436")
+                structural_env.setdefault("HYPURA_MODELS_DIR", str(ROOT / "models" / "gguf"))
+                structural_model_path = _resolve_hypura_model_path(structural_model, chosen_model_profile)
+                structural_cmd = ["bash", str(structural_script)]
+                if structural_script.name == "start_hypura.sh" and structural_model_path is not None:
+                    structural_env.setdefault("HYPURA_SKIP_DOTENV", "1")
+                    structural_cmd.append(str(structural_model_path))
+                log_path = _launch_background_service(
+                    structural_cmd,
+                    "llama_structural",
+                    env=structural_env,
+                )
+                ok, detail = _poll_service(lambda: _check_service_listener(structural_endpoint), timeout_s=30)
+                notes.append(f"Structural llama.cpp {'started' if ok else 'start attempted'} ({detail}). Log: {log_path}")
+        else:
+            notes.append(f"Structural lane already available ({structural_detail}).")
+
+        if not prose_ok:
+            model_path = _resolve_prose_model_path(model_name, chosen_model_profile)
+            prose_env = runtime_env.copy()
+            prose_env.setdefault("HYPURA_PORT", "11435")
+            prose_env.setdefault("HYPURA_MODELS_DIR", str(ROOT / "models" / "gguf"))
+            if model_path is not None:
+                prose_env["PROSE_MODEL_PATH"] = str(model_path)
+            prose_script = _script_path("start_rotorquant_prose.sh", "start_hypura.sh")
+            if prose_script is None:
+                notes.append("Prose launcher script not found under scripts/.")
+            else:
+                prose_cmd = ["bash", str(prose_script)]
+                if prose_script.name == "start_hypura.sh" and model_path is not None:
+                    prose_env.setdefault("HYPURA_SKIP_DOTENV", "1")
+                    prose_cmd.append(str(model_path))
+                log_path = _launch_background_service(
+                    prose_cmd,
+                    "llama_prose",
+                    env=prose_env,
+                )
+                ok, detail = _poll_service(lambda: _check_service_listener(prose_endpoint), timeout_s=30)
+                notes.append(f"Prose llama.cpp {'started' if ok else 'start attempted'} ({detail}). Log: {log_path}")
+        else:
+            notes.append(f"Prose lane already available ({prose_detail}).")
+
+    elif backend in {"hypura", "openclaw"}:
+        hypura_ok, hypura_detail = check_hypura()
+        if hypura_ok:
+            inventory_ok, inventory_detail = _hypura_inventory_ok(endpoint, model_name)
+            if inventory_ok:
+                notes.append(f"Hypura already serving requested model ({inventory_detail}).")
+            else:
+                notes.append(
+                    "Hypura is already running but the requested model is not loaded "
+                    f"({inventory_detail}). Stop the current Hypura instance before switching models."
+                )
+        else:
+            model_path = _resolve_hypura_model_path(model_name, chosen_model_profile)
+            if model_path is None:
+                notes.append(
+                    f"Hypura model path not found for {model_name}. Set WORK_HYPURA_MODEL_PATH/HYPURA_MODEL_PATH or place the GGUF under {SETTINGS.hypura_models_dir}."
+                )
+            else:
+                log_path = _launch_background_service(
+                    ["bash", str(ROOT / "scripts" / "start_hypura.sh"), str(model_path)],
+                    "hypura",
+                    env=runtime_env,
+                )
+                ok, detail = _poll_service(check_hypura, timeout_s=30)
+                notes.append(f"Hypura {'started' if ok else 'start attempted'} ({detail}). Log: {log_path}")
+
+    if backend == "mlx":
+        mlx_ok, mlx_detail = check_mlx_endpoint(endpoint)
+        if mlx_ok:
+            notes.append(f"MLX endpoint already available ({mlx_detail}).")
+        else:
+            log_path = _launch_background_service(_mlx_server_command(endpoint, model_name), "mlx")
+            ok, detail = _poll_service(lambda: check_mlx_endpoint(endpoint), timeout_s=45)
+            notes.append(f"MLX {'started' if ok else 'start attempted'} ({detail}). Log: {log_path}")
+
+    notes.append("")
+    notes.append(get_service_status())
+    return "\n".join(notes)
 
 
 def _chapter_artifacts(chapter_num: int) -> dict[str, Path]:
@@ -871,46 +1284,241 @@ def _wav_seconds(path: Path) -> float:
 
 def _resolved_backend() -> str:
     backend = SETTINGS.llm_backend.strip().lower()
-    if backend not in {"openclaw", "local_disk_kv"}:
-        backend = "local_disk_kv"
+    if backend in {"dual", "rotorquant", "llama-server"}:
+        return "dual"
+    if backend not in {"openclaw", "hypura", "local_disk_kv", "ollama"}:
+        backend = "dual"
     if SETTINGS.use_local_disk_kv:
         backend = "local_disk_kv"
     return backend
 
 
-def _kv_cache_status() -> tuple[str, str]:
-    runs_dir = ROOT / SETTINGS.diagnostics_dir / "runs"
-    if runs_dir.exists():
-        startup_files = sorted(runs_dir.glob("*_startup.json"), key=lambda p: p.stat().st_mtime, reverse=True)
-        if startup_files:
-            try:
-                payload = json.loads(startup_files[0].read_text(encoding="utf-8"))
-                inventory = payload.get("router_health", {}).get("prose_inventory", {})
-                if inventory.get("configured_present"):
-                    return "runtime-verified", "configured Hypura model observed in /api/tags"
-                if inventory.get("ok"):
-                    return "partially-verified", "Hypura /api/tags reachable but configured model not observed"
-            except Exception:
-                pass
+def _kv_cache_status(runtime_env: dict[str, str] | None = None) -> tuple[str, str]:
+    state = _runner_state()
+    runner_env = state.get("env") if isinstance(state, dict) else None
+    source_env = runtime_env if isinstance(runtime_env, dict) else None
 
-    configured_mode = (
-        os.getenv("OLLAMA_KV_CACHE_TYPE")
-        or os.getenv("LLAMA_CACHE_TYPE_V")
-        or os.getenv("KV_CACHE_TYPE")
-        or ""
-    ).strip()
+    configured_mode = ""
+    forced_quant = ""
+    if source_env is not None:
+        forced_quant = (source_env.get("HYPURA_FORCE_KV_QUANT") or "").strip()
+        configured_mode = (
+            source_env.get("OLLAMA_KV_CACHE_TYPE")
+            or source_env.get("LLAMA_CACHE_TYPE_V")
+            or source_env.get("KV_CACHE_TYPE")
+            or ""
+        ).strip()
+
+    if isinstance(runner_env, dict):
+        if not forced_quant:
+            forced_quant = (runner_env.get("HYPURA_FORCE_KV_QUANT") or "").strip()
+        if not configured_mode:
+            configured_mode = (
+                runner_env.get("OLLAMA_KV_CACHE_TYPE")
+                or runner_env.get("LLAMA_CACHE_TYPE_V")
+                or runner_env.get("KV_CACHE_TYPE")
+                or ""
+            ).strip()
+
+    if not forced_quant:
+        forced_quant = (os.getenv("HYPURA_FORCE_KV_QUANT") or "").strip()
+
+    if forced_quant:
+        if configured_mode:
+            return configured_mode, f"forced Hypura KV quantization via env ({forced_quant})"
+        return f"hypura_{forced_quant}", f"forced Hypura KV quantization via env ({forced_quant})"
+
     if not configured_mode:
-        return "unknown", "no KV compression env flag detected in app process"
+        configured_mode = (
+            os.getenv("OLLAMA_KV_CACHE_TYPE")
+            or os.getenv("LLAMA_CACHE_TYPE_V")
+            or os.getenv("KV_CACHE_TYPE")
+            or ""
+        ).strip()
+
+    if not configured_mode:
+        return "off", "no KV compression mode configured for the active run"
     if configured_mode.lower().startswith("turbo"):
         return configured_mode, "compression mode configured by env"
     return configured_mode, "configured mode is not a turbo compression type"
 
 
+def _port_open(port: int) -> bool:
+    import socket
+
+    sock = socket.socket()
+    sock.settimeout(0.5)
+    try:
+        sock.connect(("127.0.0.1", int(port)))
+        return True
+    except Exception:
+        return False
+    finally:
+        sock.close()
+
+
+def _latest_memory_snapshot() -> dict[str, Any] | None:
+    memory_dir = ROOT / ".state" / "diagnostics" / "memory"
+    if not memory_dir.exists():
+        return None
+
+    candidates = sorted(memory_dir.glob("ch*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)
+    for file_path in candidates:
+        try:
+            lines = [line.strip() for line in file_path.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip()]
+            if not lines:
+                continue
+            payload = json.loads(lines[-1])
+            if isinstance(payload, dict):
+                payload["_source"] = str(file_path)
+                return payload
+        except Exception:
+            continue
+    return None
+
+
+def _hypura_load_summary() -> dict[str, Any]:
+    summary: dict[str, Any] = {
+        "port_open": _port_open(SETTINGS.hypura_port),
+        "processes": [],
+    }
+
+    try:
+        proc = subprocess.run(["pgrep", "-fl", "hypura"], check=False, capture_output=True, text=True)
+        if proc.returncode == 0:
+            summary["processes"] = [line.strip() for line in (proc.stdout or "").splitlines() if line.strip()][:6]
+    except Exception as exc:
+        summary["process_error"] = str(exc)
+
+    log_path = ROOT / ".state" / "hypura_start.log"
+    summary["log_path"] = str(log_path)
+    if not log_path.exists():
+        summary["log_present"] = False
+        return summary
+
+    summary["log_present"] = True
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="replace")
+    except Exception as exc:
+        summary["log_error"] = str(exc)
+        return summary
+
+    def _extract(pattern: str) -> str:
+        match = re.search(pattern, text)
+        return match.group(1).strip() if match else ""
+
+    cpu_layers = re.findall(r"load_tensors:\s+layer\s+(\d+)\s+assigned to device CPU", text)
+    summary.update(
+        {
+            "model": _extract(r"model:\s+(.+)"),
+            "launch_context": _extract(r"context:(\d+)"),
+            "arch": _extract(r"print_info:\s+arch\s+=\s+(.+)"),
+            "file_type": _extract(r"print_info:\s+file type\s+=\s+(.+)"),
+            "file_size": _extract(r"print_info:\s+file size\s+=\s+(.+)"),
+            "train_ctx": _extract(r"print_info:\s+n_ctx_train\s+=\s+(.+)"),
+            "layer_count": _extract(r"print_info:\s+n_layer\s+=\s+(.+)"),
+            "cpu_layer_records": len(cpu_layers),
+            "max_cpu_layer_index": max((int(v) for v in cpu_layers), default=-1),
+            "tensor_records": len(re.findall(r"^create_tensor:", text, flags=re.MULTILINE)),
+            "ready_marker": "listening on" in text.lower() or "server listening" in text.lower(),
+            "tail": [line for line in text.splitlines()[-6:] if line.strip()],
+        }
+    )
+    return summary
+
+
+def get_advanced_runtime_diagnostics(
+    start_chapter: int | str | None,
+    last_chapter: int | str | None,
+    chapter_limit: int | str | None = None,
+) -> str:
+    available = _max_known_chapters()
+    requested_start = _coerce_int(start_chapter, default=0)
+    requested_last = _coerce_int(last_chapter, default=0)
+    legacy_limit = _coerce_int(chapter_limit, default=0)
+    run_start, run_last = _normalize_chapter_range(requested_start, requested_last, available, legacy_limit)
+    current = _next_pending_chapter(run_start, run_last)
+
+    memory = _latest_memory_snapshot()
+    hypura = _hypura_load_summary()
+    kv_mode, kv_detail = _kv_cache_status()
+
+    lines = [
+        "Advanced Runtime Diagnostics:",
+        f"- chapter focus: ch{current:02d}",
+        f"- kv cache mode: {kv_mode}",
+        f"- kv cache detail: {kv_detail}",
+    ]
+
+    if memory:
+        lines.extend(
+            [
+                "- memory snapshot:",
+                f"  label={memory.get('label', 'unknown')} action={memory.get('action', 'n/a')} rss_mb={memory.get('rss_mb', 'n/a')}",
+                f"  swap_mb={memory.get('swap_used_mb', 'n/a')} pageouts={memory.get('pageouts', 'n/a')} free_disk_gb={memory.get('free_disk_gb', 'n/a')}",
+                f"  source={memory.get('_source', 'n/a')}",
+            ]
+        )
+    else:
+        lines.append("- memory snapshot: none available yet")
+
+    lines.extend(
+        [
+            "- hypura runtime:",
+            f"  api_port_{SETTINGS.hypura_port}: {'open' if hypura.get('port_open') else 'closed'}",
+            f"  process_count={len(hypura.get('processes', []))}",
+        ]
+    )
+    for proc_row in hypura.get("processes", []):
+        lines.append(f"  proc={proc_row}")
+
+    if hypura.get("log_present"):
+        lines.append(f"  model={hypura.get('model') or 'unknown'}")
+        lines.append(
+            "  gguf="
+            f"arch:{hypura.get('arch') or 'n/a'} "
+            f"layers:{hypura.get('layer_count') or 'n/a'} "
+            f"ctx_train:{hypura.get('train_ctx') or 'n/a'} "
+            f"file:{hypura.get('file_type') or 'n/a'}"
+        )
+        lines.append(
+            f"  load_progress=cpu_layers_seen:{hypura.get('cpu_layer_records', 0)} max_layer_idx:{hypura.get('max_cpu_layer_index', -1)} tensors:{hypura.get('tensor_records', 0)}"
+        )
+        lines.append(
+            f"  load_state={'ready-marker-detected' if hypura.get('ready_marker') else 'loading-or-stalled'}"
+        )
+        if not hypura.get("port_open"):
+            lines.append(
+                "  note=loader progress can appear while API is still unavailable; port-open is the readiness gate"
+            )
+    else:
+        lines.append("  startup_log=missing (.state/hypura_start.log)")
+
+    if hypura.get("launch_context") and hypura.get("train_ctx") and str(hypura.get("launch_context")) != str(hypura.get("train_ctx")):
+        launch_ctx = _coerce_int(hypura.get("launch_context"), default=0)
+        train_ctx = _coerce_int(hypura.get("train_ctx"), default=0)
+        if launch_ctx > 0 and train_ctx > 0:
+            ratio = launch_ctx / train_ctx
+            if ratio <= 0.25:
+                lines.append(
+                    f"- note: launch context {launch_ctx} is far below train context {train_ctx} "
+                    "(conservative runtime setting for memory stability)"
+                )
+            else:
+                lines.append(
+                    f"- warning: launch context {launch_ctx} differs from train context {train_ctx}; verify quality/latency tradeoff"
+                )
+        else:
+            lines.append(
+                f"- warning: launch context {hypura.get('launch_context')} differs from train context {hypura.get('train_ctx')}"
+            )
+
+    return "\n".join(lines)
+
+
 def get_service_status() -> str:
     backend = _resolved_backend()
     ffmpeg_ok, ffmpeg_detail = check_ffmpeg()
-    ollama_ok, ollama_detail = check_ollama()
-    local_kv_ok, local_kv_detail = check_local_disk_kv()
     chatterbox_ok, chatterbox_detail = check_chatterbox()
     endpoints: list[str] = []
     if chatterbox_ok:
@@ -927,17 +1535,21 @@ def get_service_status() -> str:
     ]
     kv_mode, kv_detail = _kv_cache_status()
     lines.append(f"- kv cache compression: {kv_mode} ({kv_detail})")
-    if backend == "local_disk_kv":
-        lines.append(f"- local_disk_kv (required): {'OK' if local_kv_ok else 'DOWN'} ({local_kv_detail})")
-        lines.append(f"- ollama (optional): {'OK' if ollama_ok else 'DOWN'} ({ollama_detail})")
+    lines.append(f"- memory backend: {_memory_backend_name()}")
+    if backend == "dual":
+        structural_ok, structural_detail = _check_service_listener(_structural_endpoint())
+        prose_ok, prose_detail = _check_service_listener(_prose_endpoint())
+        lines.append(f"- structural lane listener (required): {'OK' if structural_ok else 'DOWN'} ({structural_detail})")
+        lines.append(f"- prose lane listener (required): {'OK' if prose_ok else 'DOWN'} ({prose_detail})")
+        lines.append("- note: listener checks are fast startup diagnostics; completion readiness is validated during preflight/pipeline run")
     else:
-        lines.append(f"- ollama (required): {'OK' if ollama_ok else 'DOWN'} ({ollama_detail})")
-        lines.append(f"- local_disk_kv (optional): {'OK' if local_kv_ok else 'DOWN'} ({local_kv_detail})")
+        lines.append("- non-dual backend selected; switch to dual for clean stack validation")
 
     if endpoints:
         lines.append("- chatterbox endpoints: " + ", ".join(endpoints))
     else:
         lines.append("- chatterbox endpoints: none discovered")
+
     return "\n".join(lines)
 
 
@@ -1115,12 +1727,20 @@ def get_pipeline_runtime_snapshot(
         f"Phase: {phase}",
         timing_text,
     ]
+    operating_profile = str(state.get("operating_profile") or "")
     model_profile = str(state.get("model_profile") or "")
     model_name = str(state.get("model_name") or "")
+    if operating_profile:
+        status_lines.append(f"Operating profile: {operating_profile}")
     if model_profile:
         status_lines.append(f"Model profile: {model_profile}")
     if model_name:
         status_lines.append(f"Model: {model_name}")
+    runner_env = state.get("env") if isinstance(state, dict) else None
+    if isinstance(runner_env, dict):
+        status_lines.append(
+            f"Memory backend: {runner_env.get('MEMORY_BACKEND', _memory_backend_name())}"
+        )
     kv_mode = str(state.get("kv_cache_mode") or "")
     kv_evidence = str(state.get("kv_cache_evidence") or "")
     if kv_mode or kv_evidence:
@@ -1198,6 +1818,7 @@ def start_pipeline_run(
     model_profile: str = MODEL_PROFILE_QWEN25_Q5,
     chapter_complete_alert: str = "double_beep",
     chapter_limit: int | str | None = None,
+    operating_profile: str = "",
 ) -> str:
     state = _runner_state()
     if _running_pid(state.get("pid")):
@@ -1263,35 +1884,118 @@ def start_pipeline_run(
     if not chatterbox_ok:
         return f"Run blocked: chatterbox is unavailable ({chatterbox_detail})."
 
-    backend = _resolved_backend()
+    selected_profile = (operating_profile or OPERATING_PROFILE_RECOVERY).strip()
+    resolved_model_profile, _, _, _ = get_operating_profile_defaults(selected_profile)
+    chosen_model_profile = (model_profile or resolved_model_profile).strip() or resolved_model_profile
+
+    endpoint, model_name, selected_backend = _model_profile_runtime(chosen_model_profile)
+    backend = selected_backend
+    structural_url = os.getenv("STRUCTURAL_URL", os.getenv("QWEN25_OLLAMA_URL", "http://127.0.0.1:11436/v1/chat/completions"))
+    structural_model = os.getenv("STRUCTURAL_MODEL", os.getenv("QWEN25_OLLAMA_MODEL", "tinyllama-1.1b-chat-v1.0.Q2_K"))
     local_kv_ok, local_kv_detail = check_local_disk_kv()
     ollama_ok, ollama_detail = check_ollama()
     if backend == "local_disk_kv" and not local_kv_ok:
         return f"Run blocked: local_disk_kv backend is unavailable ({local_kv_detail})."
+    if backend == "mlx":
+        mlx_ok, mlx_detail = check_mlx_endpoint(endpoint)
+        if not mlx_ok:
+            return (
+                f"Run blocked: MLX endpoint {endpoint} is unavailable ({mlx_detail}). "
+                "Start mlx_lm.server first: "
+                "mlx_lm.server --model mlx-community/gpt-oss-20b-MXFP4-Q4 --port 8080"
+            )
+    if backend in {"dual", "rotorquant", "llama-server"}:
+        structural_ok, structural_detail = check_structural_lane(structural_model)
+        prose_ok, prose_detail = check_prose_lane(model_name)
+        if not structural_ok:
+            return (
+                f"Run blocked: structural lane endpoint is unavailable ({structural_detail}). "
+                "Start structural llama.cpp server first (port 11436)."
+            )
+        if not prose_ok:
+            return (
+                f"Run blocked: prose lane endpoint is unavailable ({prose_detail}). "
+                "Start prose llama.cpp server first (port 11435) with lower-memory settings."
+            )
+    if backend in {"openclaw", "hypura"}:
+        hypura_ok, hypura_detail = check_hypura()
+        if not hypura_ok:
+            return (
+                f"Run blocked: hypura endpoint is unavailable ({hypura_detail}). "
+                "Start hypura first and confirm /api/chat is reachable."
+            )
+        inventory_ok, inventory_detail = _hypura_inventory_ok(endpoint, model_name)
+        if not inventory_ok:
+            return (
+                "Run blocked: selected Hypura model is not available in runtime inventory "
+                f"({inventory_detail}). Start Hypura on port 11435 with the configured GGUF first."
+            )
+        if not local_kv_ok:
+            return (
+                f"Run blocked: local_disk_kv backend is unavailable ({local_kv_detail}). "
+                "Hypura profile still requires a structural local model endpoint."
+            )
     if backend == "openclaw" and not ollama_ok:
         return f"Run blocked: ollama is unavailable ({ollama_detail})."
 
     env = os.environ.copy()
-    env["LLM_BACKEND"] = "local_disk_kv"
-    env["USE_LOCAL_DISK_KV"] = "true"
+    env.update(_model_profile_runtime_env(chosen_model_profile))
+    env["LLM_BACKEND"] = backend
+    env["USE_LOCAL_DISK_KV"] = "true" if backend == "local_disk_kv" else "false"
     env["PROJECT_NAME"] = project_name
-    endpoint, model_name = _model_profile_runtime(model_profile)
-    env["LOCAL_DISK_KV_URL"] = endpoint
-    env["LOCAL_DISK_KV_MODEL"] = model_name
+    env["OLLAMA_URL"] = structural_url
+    env["OLLAMA_MODEL"] = structural_model
+
+    # Keep structural and prose lanes explicit so Hypura profile runs hybrid as intended.
+    if backend in {"dual", "rotorquant", "llama-server"}:
+        env["STRUCTURAL_URL"] = structural_url
+        env["STRUCTURAL_MODEL"] = structural_model
+        env["PROSE_URL"] = endpoint
+        env["PROSE_MODEL"] = model_name
+        env["LOCAL_DISK_KV_URL"] = structural_url
+        env["LOCAL_DISK_KV_MODEL"] = structural_model
+    elif backend in {"openclaw", "hypura"}:
+        env["LOCAL_DISK_KV_URL"] = structural_url
+        env["LOCAL_DISK_KV_MODEL"] = structural_model
+        env["HYPURA_URL"] = endpoint
+        env["HYPURA_MODEL"] = model_name
+    elif backend == "local_disk_kv":
+        env["LOCAL_DISK_KV_URL"] = endpoint
+        env["LOCAL_DISK_KV_MODEL"] = model_name
+    elif backend == "mlx":
+        env["MLX_URL"] = endpoint
+        env["MLX_MODEL"] = model_name
+
     env["LLM_MODEL"] = model_name
-    env["EXPANSION_PASSES"] = "0"
+    # Hypura/OpenClaw use Ollama as the structural lane; allow that lane to take over
+    # if the prose lane (tinyllama / GGUF) returns empty content or errors.
+    if backend in {"hypura", "openclaw", "dual", "rotorquant", "llama-server"}:
+        env["ALLOW_MODEL_FALLBACK"] = "true"
+    else:
+        env["ALLOW_MODEL_FALLBACK"] = "false"
+    env.setdefault("EXPANSION_PASSES", os.getenv("EXPANSION_PASSES", "2"))
     env["CHAPTER_START"] = str(start_num)
     env["CHAPTER_LAST"] = str(last_num)
     env["CHAPTER_COUNT"] = str(last_num)
-    manual_voice_tuning = os.getenv("STORY_STUDIO_MANUAL_VOICE_TUNING", "true").strip().lower() in {"1", "true", "yes", "on"}
+    manual_voice_tuning = os.getenv("STORY_STUDIO_MANUAL_VOICE_TUNING", "false").strip().lower() in {"1", "true", "yes", "on"}
     env["PAUSE_BEFORE_NARRATION_REVIEW"] = "true" if manual_voice_tuning else "false"
     env["PAUSE_AFTER_CHAPTER_REVIEW"] = "false"
     alert_mode = (chapter_complete_alert or "double_beep").strip().lower().replace(" ", "_")
     if alert_mode not in {"double_beep", "gong", "off"}:
         alert_mode = "double_beep"
     env["CHAPTER_COMPLETE_ALERT"] = alert_mode
+    env["MEMPALACE_ENABLED"] = "true"
 
-    kv_mode, kv_evidence = _kv_cache_status()
+    if backend in {"hypura", "openclaw"}:
+        forced_quant = (env.get("HYPURA_FORCE_KV_QUANT") or "").strip()
+        kv_mode = env.get("KV_CACHE_TYPE", f"hypura_{forced_quant}" if forced_quant else "")
+        kv_evidence = (
+            f"forced Hypura KV quantization via run env ({forced_quant})"
+            if forced_quant
+            else "no KV compression mode configured for the active run"
+        )
+    else:
+        kv_mode, kv_evidence = _kv_cache_status(env)
 
     explicit_word_targets = False
     if word_target_min is not None and int(word_target_min) > 0:
@@ -1335,15 +2039,33 @@ def start_pipeline_run(
             "kv_cache_mode": kv_mode,
             "kv_cache_evidence": kv_evidence,
             "project": project_name,
-            "model_profile": model_profile,
+            "operating_profile": selected_profile,
+            "model_profile": chosen_model_profile,
             "model_name": model_name,
             "model_url": endpoint,
+            "env": {
+                key: env[key]
+                for key in [
+                    "LLM_BACKEND",
+                    "LLM_NUM_CTX",
+                    "HYPURA_CONTEXT",
+                    "HYPURA_FORCE_KV_QUANT",
+                    "KV_CACHE_TYPE",
+                    "MEMPALACE_ENABLED",
+                    "HYPURA_MODEL",
+                    "PROSE_MODEL",
+                    "LOCAL_DISK_KV_MODEL",
+                    "MLX_MODEL",
+                ]
+                if key in env
+            },
         }
     )
     update_session(project_name, active_stage="running", pause_reason="", last_run_started_at=str(int(time.time())))
     return (
         f"Pipeline started (pid={process.pid}) for chapters {start_num}-{last_num}. "
-        f"Alert: {alert_mode}. KV cache: {kv_mode or 'unknown'}. Log: {log_path}.{clear_note}"
+        f"Alert: {alert_mode}. KV cache: {kv_mode or 'unknown'}. "
+        f"MemPalace: on. Log: {log_path}.{clear_note}"
     )
 
 

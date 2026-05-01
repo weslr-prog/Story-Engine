@@ -6,6 +6,8 @@ import os
 import time
 import gc
 import uuid
+import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -16,7 +18,7 @@ ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
 from config import SETTINGS
-from engine.agents import ArchitectAgent, EditorAgent, MemoryManagerAgent, PlannerAgent, WriterAgent
+from engine.agents import ArchitectAgent, EditorAgent, MemoryManagerAgent, PlannerAgent, WriterAgent, _extract_prose_only
 from engine.genre_pack import load_genre_pack
 from engine.inference_router import InferenceRouter
 from engine.local_llm import HypuraClient, OllamaClient
@@ -214,6 +216,70 @@ def _word_count(text: str) -> int:
     return len((text or "").split())
 
 
+def _normalize_sentence(text: str) -> str:
+    return re.sub(r"\s+", " ", (text or "").strip().lower())
+
+
+def _cap_repeated_sentences(text: str, max_repeat: int) -> str:
+    if not text or max_repeat < 1:
+        return text
+
+    parts = re.split(r"(?<=[.!?])(\s+)", text)
+    counts: Counter[str] = Counter()
+    kept: list[str] = []
+
+    idx = 0
+    while idx < len(parts):
+        sentence = parts[idx]
+        separator = parts[idx + 1] if idx + 1 < len(parts) else ""
+        stripped = sentence.strip()
+        keep_sentence = True
+
+        if len(stripped) > 8:
+            norm = _normalize_sentence(stripped)
+            if counts[norm] >= max_repeat:
+                keep_sentence = False
+            else:
+                counts[norm] += 1
+
+        if keep_sentence:
+            kept.append(sentence)
+            if separator:
+                kept.append(separator)
+
+        idx += 2
+
+    cleaned = "".join(kept).strip()
+    return cleaned or (text or "").strip()
+
+
+def _chunk_events(events: list[str], chunk_size: int) -> list[list[str]]:
+    if chunk_size <= 0:
+        chunk_size = 1
+    return [events[idx : idx + chunk_size] for idx in range(0, len(events), chunk_size)]
+
+
+def _scene_beats(brief: dict[str, Any]) -> list[str]:
+    events = [str(evt).strip() for evt in brief.get("key_events", []) if str(evt).strip()]
+    if not events:
+        fallback = str(brief.get("goal") or brief.get("opens_with") or "Advance the chapter conflict with clear consequences.")
+        return [fallback]
+
+    chunk_size = max(1, int(os.getenv("SCENE_EVENT_CHUNK", "2") or "2"))
+    chunks = _chunk_events(events, chunk_size)
+    return ["\n".join(chunk) for chunk in chunks]
+
+
+def _scene_min_words(brief: dict[str, Any], scene_count: int) -> int:
+    env_target = int(os.getenv("SCENE_WORD_TARGET_MIN", "0") or "0")
+    if env_target > 0:
+        return env_target
+    brief_target = int(brief.get("word_target", 0) or 0)
+    if brief_target > 0 and scene_count > 0:
+        return max(260, int((brief_target / scene_count) * 0.85))
+    return 350
+
+
 def _chapter_heading(chapter_num: int, brief: dict[str, Any]) -> str:
     raw_title = str(brief.get("title") or "").strip()
     if raw_title:
@@ -240,7 +306,7 @@ def _target_min_words(brief: dict[str, Any]) -> int:
         return env_target
     brief_target = int(brief.get("word_target", 0) or 0)
     if brief_target > 0:
-        return max(800, int(brief_target * 0.8))
+        return max(800, int(brief_target * 0.95))
     return 1800
 
 
@@ -254,7 +320,7 @@ def _is_truthy(name: str, default: bool = False) -> bool:
 def _chapter_range(max_chapters: int) -> tuple[int, int]:
     start = int(os.getenv("CHAPTER_START", "1") or "1")
     last = int(os.getenv("CHAPTER_LAST", os.getenv("CHAPTER_COUNT", str(max_chapters))) or str(max_chapters))
-    start = max(1, start)
+    start = max(1, min(start, max_chapters))
     last = max(start, min(last, max_chapters))
     return start, last
 
@@ -290,6 +356,7 @@ def _write_chapter_inference_report(
     context: PipelineContext,
     fallback_count: int,
     memory_events: list[dict[str, Any]],
+    chapter_metrics: dict[str, Any] | None = None,
 ) -> None:
     report = {
         "run_id": run_id,
@@ -297,6 +364,7 @@ def _write_chapter_inference_report(
         "fallback_count": fallback_count,
         "inference": context.inference_log,
         "memory_events": memory_events,
+        "chapter_metrics": chapter_metrics or {},
         "timestamp": time.time(),
     }
     path = ROOT / SETTINGS.reviews_dir / f"ch{chapter_num:02d}_inference_report.json"
@@ -406,10 +474,18 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
 
     for chapter_num in range(start_ch, last_ch + 1):
         brief = briefs[chapter_num - 1]
+        beats = _scene_beats(brief)
+        scene_count = len(beats)
         context.current_chapter = chapter_num
         context.current_scene = 1
         context.state = FSMState.INIT
         context.inference_log = {}
+        context.metadata = {
+            "scene_beats": beats,
+            "scene_count": scene_count,
+            "scene_texts": [],
+            "scene_word_counts": [],
+        }
         memory_events: list[dict[str, Any]] = []
 
         chapter_start = monitor.snapshot(chapter_num, "chapter_start")
@@ -508,19 +584,30 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
                     return 0
                 if dry_run:
                     draft = (
-                        f"Chapter {chapter_num} draft placeholder.\n"
+                        f"Chapter {chapter_num} scene {context.current_scene} draft placeholder.\n"
                         "The protagonist faces a turning-point choice and uncovers a new clue."
                     )
                 else:
+                    scene_idx = max(1, min(context.current_scene, scene_count))
+                    scene_beat = beats[scene_idx - 1]
+                    prior_scenes = "\n\n".join(context.metadata.get("scene_texts", []))
                     draft = writer.run(
                         context,
                         {
-                            "instruction": "Write a polished chapter in past tense unless the brief explicitly requires another tense.",
+                            "instruction": (
+                                f"Write scene {scene_idx} of {scene_count}. Focus on this beat:\n{scene_beat}\n"
+                                "Write polished scene prose in past tense unless the brief explicitly requires another tense."
+                            ),
                             "style": genre.writer_prefix,
                             "brief": brief,
                             "characters": characters,
                             "previous_summary": plan_vars.get("previous_summary", ""),
                             "scene_plan": context.metadata.get("scene_plan", ""),
+                            "scene_beat": scene_beat,
+                            "prior_scenes": prior_scenes,
+                            "word_target": max(350, int((brief.get("word_target", 2200) or 2200) / max(1, scene_count))),
+                            "max_tokens": int(os.getenv("WRITER_MAX_TOKENS", "1800") or "1800"),
+                            "temperature": float(os.getenv("WRITER_TEMPERATURE", "0.72") or "0.72"),
                         },
                     ).content
                     diag = context.inference_log.get("agents", {}).get("writer", {}).get("diagnostics", {})
@@ -548,80 +635,259 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
                             "instruction": "Tighten prose, remove repetition, preserve plot facts.",
                             "editor_prefix": genre.editor_prefix,
                             "draft": context.metadata.get("draft", ""),
+                            "max_tokens": int(os.getenv("EDITOR_MAX_TOKENS", "1700") or "1700"),
+                            "temperature": float(os.getenv("EDITOR_TEMPERATURE", "0.68") or "0.68"),
                         },
                     ).content
                     diag = context.inference_log.get("agents", {}).get("editor", {}).get("diagnostics", {})
                     if diag.get("fallback_used"):
                         fallback_count += 1
-                _write(artifacts.edited, edited)
-
-                final_text = edited
+                scene_target = _scene_min_words(brief, scene_count)
+                scene_text = edited
 
                 if not dry_run:
-                    min_words = _target_min_words(brief)
-                    expansion_passes = max(0, int(os.getenv("EXPANSION_PASSES", "1") or "1"))
-                    pass_idx = 0
-                    while _word_count(final_text) < min_words and pass_idx < expansion_passes:
-                        pass_idx += 1
+                    scene_expansion_passes = max(0, int(os.getenv("SCENE_EXPANSION_PASSES", "1") or "1"))
+                    scene_gain_min = max(40, int(os.getenv("SCENE_MIN_GAIN_WORDS", "100") or "100"))
+                    scene_pass_idx = 0
+                    while _word_count(scene_text) < scene_target and scene_pass_idx < scene_expansion_passes:
+                        scene_pass_idx += 1
+                        before_words = _word_count(scene_text)
                         expanded = writer.run(
                             context,
                             {
                                 "instruction": (
-                                    f"Expand this chapter to at least {min_words} words while preserving canon, tone, "
-                                    "plot facts, and chapter continuity. Return only chapter prose."
+                                    f"Expand scene {context.current_scene} to at least {scene_target} words while preserving canon, "
+                                    "tone, continuity, and beat order. Do not reuse exact sentences from earlier passes; "
+                                    "vary dialogue tags and action beats. Return only scene prose."
                                 ),
                                 "style": genre.writer_prefix,
                                 "brief": brief,
                                 "characters": characters,
                                 "previous_summary": plan_vars.get("previous_summary", ""),
                                 "scene_plan": context.metadata.get("scene_plan", ""),
-                                "draft": final_text,
+                                "scene_beat": beats[max(0, context.current_scene - 1)],
+                                "prior_scenes": "\n\n".join(context.metadata.get("scene_texts", [])),
+                                "draft": scene_text,
+                                "max_tokens": int(os.getenv("WRITER_MAX_TOKENS", "1800") or "1800"),
+                                "temperature": float(os.getenv("WRITER_TEMPERATURE", "0.72") or "0.72"),
                             },
                         ).content
-                        final_text = editor.run(
+                        candidate_scene = editor.run(
                             context,
                             {
-                                "instruction": "Polish this expanded chapter while preserving plot and continuity.",
+                                "instruction": "Polish this expanded scene while preserving plot and continuity.",
                                 "editor_prefix": genre.editor_prefix,
                                 "draft": expanded,
+                                "max_tokens": int(os.getenv("EDITOR_MAX_TOKENS", "1700") or "1700"),
+                                "temperature": float(os.getenv("EDITOR_TEMPERATURE", "0.68") or "0.68"),
                             },
                         ).content
+                        after_words = _word_count(candidate_scene)
+                        if (after_words - before_words) < scene_gain_min and after_words < scene_target:
+                            expanded = writer.run(
+                                context,
+                                {
+                                    "instruction": (
+                                        f"Lengthen scene {context.current_scene} with concrete action and sensory detail. "
+                                        f"Add at least {scene_gain_min} words while preserving canon and beat order. "
+                                        "Avoid repeating any full sentence from prior draft text."
+                                    ),
+                                    "style": genre.writer_prefix,
+                                    "brief": brief,
+                                    "characters": characters,
+                                    "previous_summary": plan_vars.get("previous_summary", ""),
+                                    "scene_plan": context.metadata.get("scene_plan", ""),
+                                    "scene_beat": beats[max(0, context.current_scene - 1)],
+                                    "prior_scenes": "\n\n".join(context.metadata.get("scene_texts", [])),
+                                    "draft": candidate_scene,
+                                    "max_tokens": int(os.getenv("WRITER_MAX_TOKENS", "1800") or "1800"),
+                                    "temperature": float(os.getenv("WRITER_TEMPERATURE", "0.72") or "0.72"),
+                                },
+                            ).content
+                            candidate_scene = editor.run(
+                                context,
+                                {
+                                    "instruction": "Polish this expanded scene while preserving plot and continuity.",
+                                    "editor_prefix": genre.editor_prefix,
+                                    "draft": expanded,
+                                    "max_tokens": int(os.getenv("EDITOR_MAX_TOKENS", "1700") or "1700"),
+                                    "temperature": float(os.getenv("EDITOR_TEMPERATURE", "0.68") or "0.68"),
+                                },
+                            ).content
+                        scene_text = candidate_scene
+
                         diag = context.inference_log.get("agents", {}).get("editor", {}).get("diagnostics", {})
                         if diag.get("fallback_used"):
                             fallback_count += 1
 
-                final_text = _with_chapter_heading(chapter_num, brief, final_text)
-                lint_report = lint_chapter(final_text, chapter_num, brief, LintSettings())
-                _save_json(artifacts.lint_json, lint_report)
-                _write(artifacts.lint_md, to_markdown(lint_report))
-                _write(artifacts.final, final_text)
-                _write(artifacts.tts, final_text)
+                scene_text = scene_text.strip()
+                scene_word_count = _word_count(scene_text)
+                if not dry_run and scene_word_count < scene_target and _is_truthy("BLOCK_ON_SCENE_LENGTH_FAIL", True):
+                    reason = (
+                        f"scene {context.current_scene} undersized ({scene_word_count} words) "
+                        f"below minimum {scene_target}"
+                    )
+                    _save_checkpoint(project_name, chapter_num, "scene_length_fail", reason=reason)
+                    print(f"[FAIL] {reason}")
+                    return 1
+                context.metadata.setdefault("scene_texts", []).append(scene_text)
+                context.metadata.setdefault("scene_word_counts", []).append(scene_word_count)
+                context.metadata["current_scene_final"] = scene_text
 
-                if dry_run:
-                    summary = f"Dry-run summary for chapter {chapter_num}."
-                else:
-                    summary = memory_manager.run(
-                        context,
-                        {
-                            "task": "Summarize chapter in 120-180 words with unresolved threads.",
-                            "chapter_text": final_text,
-                            "brief": brief,
-                        },
-                    ).content
-                _write(artifacts.summary, summary)
-                context.metadata["summary"] = summary
+                scene_path = ROOT / "chapters" / "scenes" / f"ch{chapter_num:02d}_sc{context.current_scene:02d}.txt"
+                _write(scene_path, scene_text)
+
+                assembled_draft = "\n\n".join(context.metadata.get("scene_texts", []))
+                _write(artifacts.draft, assembled_draft)
+                _write(artifacts.edited, assembled_draft)
                 context = fsm.advance(context)
             elif context.state == FSMState.MEMORY_UPDATE:
-                memory.add_scene(project_name, chapter_num, 1, artifacts.final.read_text(encoding="utf-8"))
+                memory.add_scene(project_name, chapter_num, context.current_scene, context.metadata.get("current_scene_final", ""))
                 memory.update_character(project_name, "Mara Quill", context.metadata.get("summary", ""))
                 context = fsm.advance(context)
             elif context.state == FSMState.CHECKPOINT:
                 _save_checkpoint(project_name, chapter_num + 1, context.state.value, reason="chapter_checkpoint")
                 context = fsm.advance(context)
             elif context.state == FSMState.NEXT_SCENE:
-                context.state = FSMState.COMPLETE
+                total_scenes = int(context.metadata.get("scene_count", 1) or 1)
+                if context.current_scene < total_scenes:
+                    context.current_scene += 1
+                    context.state = FSMState.SCENE_WRITE
+                else:
+                    context.state = FSMState.COMPLETE
             else:
                 context.state = FSMState.FAILED
+
+        scene_texts = context.metadata.get("scene_texts", [])
+        final_text = "\n\n".join(scene_texts).strip()
+
+        if not dry_run:
+            min_words = _target_min_words(brief)
+            expansion_passes = max(0, int(os.getenv("EXPANSION_PASSES", "2") or "2"))
+            chapter_gain_min = max(60, int(os.getenv("CHAPTER_MIN_GAIN_WORDS", "120") or "120"))
+            pass_idx = 0
+            while _word_count(final_text) < min_words and pass_idx < expansion_passes:
+                pass_idx += 1
+                before_words = _word_count(final_text)
+                expanded = writer.run(
+                    context,
+                    {
+                        "instruction": (
+                            f"Expand this chapter to at least {min_words} words while preserving canon, tone, "
+                            "plot facts, and chapter continuity. Do not reuse exact prior sentences; vary line-level "
+                            "wording and dialogue tags. Return only chapter prose."
+                        ),
+                        "style": genre.writer_prefix,
+                        "brief": brief,
+                        "characters": characters,
+                        "previous_summary": plan_vars.get("previous_summary", ""),
+                        "scene_plan": context.metadata.get("scene_plan", ""),
+                        "prior_scenes": "\n\n".join(scene_texts),
+                        "draft": final_text,
+                        "max_tokens": int(os.getenv("WRITER_MAX_TOKENS", "1800") or "1800"),
+                        "temperature": float(os.getenv("WRITER_TEMPERATURE", "0.72") or "0.72"),
+                    },
+                ).content
+                candidate_chapter = editor.run(
+                    context,
+                    {
+                        "instruction": "Polish this expanded chapter while preserving plot and continuity.",
+                        "editor_prefix": genre.editor_prefix,
+                        "draft": expanded,
+                        "max_tokens": int(os.getenv("EDITOR_MAX_TOKENS", "1700") or "1700"),
+                        "temperature": float(os.getenv("EDITOR_TEMPERATURE", "0.68") or "0.68"),
+                    },
+                ).content
+                after_words = _word_count(candidate_chapter)
+                if (after_words - before_words) < chapter_gain_min and after_words < min_words:
+                    expanded = writer.run(
+                        context,
+                        {
+                            "instruction": (
+                                f"Add at least {chapter_gain_min} words to deepen action, interiority, and scene transitions "
+                                "without changing canon or beat order. Avoid repeating any full sentence from earlier "
+                                "chapter draft text. Return only chapter prose."
+                            ),
+                            "style": genre.writer_prefix,
+                            "brief": brief,
+                            "characters": characters,
+                            "previous_summary": plan_vars.get("previous_summary", ""),
+                            "scene_plan": context.metadata.get("scene_plan", ""),
+                            "prior_scenes": "\n\n".join(scene_texts),
+                            "draft": candidate_chapter,
+                            "max_tokens": int(os.getenv("WRITER_MAX_TOKENS", "1800") or "1800"),
+                            "temperature": float(os.getenv("WRITER_TEMPERATURE", "0.72") or "0.72"),
+                        },
+                    ).content
+                    candidate_chapter = editor.run(
+                        context,
+                        {
+                            "instruction": "Polish this expanded chapter while preserving plot and continuity.",
+                            "editor_prefix": genre.editor_prefix,
+                            "draft": expanded,
+                            "max_tokens": int(os.getenv("EDITOR_MAX_TOKENS", "1700") or "1700"),
+                            "temperature": float(os.getenv("EDITOR_TEMPERATURE", "0.68") or "0.68"),
+                        },
+                    ).content
+                final_text = candidate_chapter
+
+                diag = context.inference_log.get("agents", {}).get("editor", {}).get("diagnostics", {})
+                if diag.get("fallback_used"):
+                    fallback_count += 1
+
+        final_text = _with_chapter_heading(chapter_num, brief, final_text)
+        chapter_min_words = _target_min_words(brief)
+        chapter_words = _word_count(final_text)
+        if not dry_run and chapter_words < chapter_min_words and _is_truthy("BLOCK_ON_LENGTH_FAIL", True):
+            reason = f"chapter {chapter_num} undersized ({chapter_words} words) below minimum {chapter_min_words}"
+            _save_checkpoint(project_name, chapter_num, "chapter_length_fail", reason=reason)
+            print(f"[FAIL] {reason}")
+            return 1
+
+        lint_settings = LintSettings()
+        final_text = _cap_repeated_sentences(final_text, lint_settings.max_sentence_repeat)
+        lint_report = lint_chapter(final_text, chapter_num, brief, lint_settings)
+        _save_json(artifacts.lint_json, lint_report)
+        _write(artifacts.lint_md, to_markdown(lint_report))
+        if not dry_run and (not lint_report.get("passed", False)) and _is_truthy("BLOCK_ON_LINT_FAIL", True):
+            failing = [ch for ch in lint_report.get("checks", []) if not ch.get("passed", True)]
+            fail_lines = []
+            for ch in failing:
+                viol = ch.get("violations", [])
+                if isinstance(viol, list) and viol:
+                    items = [str(v) for v in viol[:5]]
+                    suffix = f" ... (+{len(viol) - 5} more)" if len(viol) > 5 else ""
+                    fail_lines.append(f"  [{ch['name']}] " + "; ".join(items) + suffix)
+                elif isinstance(viol, dict) and any(viol.values()):
+                    fail_lines.append(f"  [{ch['name']}] {viol}")
+                else:
+                    fail_lines.append(f"  [{ch['name']}] (no violation detail)")
+            detail = "\n".join(fail_lines) if fail_lines else "  (no additional detail)"
+            reason = f"chapter {chapter_num} lint failure (blocking mode enabled)"
+            print(f"[FAIL] {reason}")
+            print(f"[FAIL] Failing checks:\n{detail}")
+            _save_checkpoint(project_name, chapter_num, "lint_fail", reason=reason)
+            return 1
+        _write(artifacts.final, final_text)
+
+        tts_text = _extract_prose_only(final_text)
+        if not tts_text:
+            tts_text = final_text
+        _write(artifacts.tts, tts_text)
+
+        if dry_run:
+            summary = f"Dry-run summary for chapter {chapter_num}."
+        else:
+            summary = memory_manager.run(
+                context,
+                {
+                    "task": "Summarize chapter in 120-180 words with unresolved threads.",
+                    "chapter_text": final_text,
+                    "brief": brief,
+                },
+            ).content
+        _write(artifacts.summary, summary)
+        context.metadata["summary"] = summary
 
         chapter_path = stitch_chapter(ROOT / "chapters", chapter_num, [artifacts.final.read_text(encoding="utf-8")])
         chapter_paths.append(chapter_path)
@@ -672,7 +938,19 @@ def run_pipeline(project_name: str, dry_run: bool = False) -> int:
                 "gc_elapsed_s": gc_elapsed,
             }
         )
-        _write_chapter_inference_report(run_id, chapter_num, context, fallback_count, memory_events)
+        chapter_word_target = int(brief.get("word_target", 0) or 0)
+        chapter_words = _word_count(final_text)
+        chapter_metrics = {
+            "chapter_word_target": chapter_word_target,
+            "chapter_word_count": chapter_words,
+            "chapter_min_words": chapter_min_words,
+            "chapter_word_delta": chapter_words - chapter_word_target if chapter_word_target else 0,
+            "scene_count": len(scene_texts),
+            "scene_word_counts": context.metadata.get("scene_word_counts", []),
+            "tts_text_word_count": _word_count(tts_text),
+            "lint_passed": bool(lint_report.get("passed", False)) if isinstance(lint_report, dict) else False,
+        }
+        _write_chapter_inference_report(run_id, chapter_num, context, fallback_count, memory_events, chapter_metrics)
 
     manuscript = stitch_novel(ROOT / "chapters", chapter_paths)
     for fmt in os.getenv("EXPORT_FORMATS", "md").split(","):
